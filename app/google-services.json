@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "15600854885",
+    "project_id": "orion-f13ff",
+    "storage_bucket": "orion-f13ff.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:15600854885:android:228bdc6d08996503fc638c",
+        "android_client_info": {
+          "package_name": "Orion.message"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCHYX4x4dI1brtlhqOWvK4tjTTLtq1emMk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
