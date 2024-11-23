@@ -15,10 +15,10 @@
         android:layout_marginBottom="24dp" />
 
     <Button
-        android:id="@+id/logoutButton"
+        android:id="@+id/startButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Cerrar sesión"
+        android:text="Iniciar aplicación"
         android:padding="12dp" />
 
 </LinearLayout>
