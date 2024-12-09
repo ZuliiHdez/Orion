@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "15600854885",
+    "firebase_url": "https://orion-f13ff-default-rtdb.europe-west1.firebasedatabase.app",
     "project_id": "orion-f13ff",
     "storage_bucket": "orion-f13ff.firebasestorage.app"
   },
@@ -12,7 +13,12 @@
           "package_name": "Orion.message"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "15600854885-qlit8ffvn9knfblhak7ilj63curuc8vc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCHYX4x4dI1brtlhqOWvK4tjTTLtq1emMk"
@@ -20,7 +26,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "15600854885-qlit8ffvn9knfblhak7ilj63curuc8vc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

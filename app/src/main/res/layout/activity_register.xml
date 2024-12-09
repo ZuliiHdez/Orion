@@ -1,28 +1,35 @@
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <LinearLayout
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical"
         android:padding="16dp"
-        android:gravity="center">
+        android:gravity="center"
+        android:background="@drawable/background_radial">
 
         <EditText
             android:id="@+id/usernameEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Nombre de usuario"
-            android:padding="12dp" />
+            android:padding="12dp"
+            android:textColor="#1247A4"
+            android:textColorHint="#1247A4"
+            android:background="@drawable/edittext_background"
+            android:elevation="4dp"
+            android:layout_marginBottom="16dp"/>
 
         <EditText
             android:id="@+id/fullNameEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Nombre completo"
-            android:padding="12dp" />
+            android:padding="12dp"
+            android:textColor="#1247A4"
+            android:textColorHint="#1247A4"
+            android:background="@drawable/edittext_background"
+            android:elevation="4dp"
+            android:layout_marginBottom="16dp" />
 
         <EditText
             android:id="@+id/emailEditText"
@@ -30,7 +37,12 @@
             android:layout_height="wrap_content"
             android:hint="Correo electrónico"
             android:inputType="textEmailAddress"
-            android:padding="12dp" />
+            android:padding="12dp"
+            android:textColor="#1247A4"
+            android:textColorHint="#1247A4"
+            android:background="@drawable/edittext_background"
+            android:elevation="4dp"
+            android:layout_marginBottom="16dp" />
 
         <EditText
             android:id="@+id/passwordEditText"
@@ -38,7 +50,12 @@
             android:layout_height="wrap_content"
             android:hint="Contraseña"
             android:inputType="textPassword"
-            android:padding="12dp" />
+            android:padding="12dp"
+            android:textColor="#1247A4"
+            android:textColorHint="#1247A4"
+            android:background="@drawable/edittext_background"
+            android:elevation="4dp"
+            android:layout_marginBottom="16dp" />
 
         <EditText
             android:id="@+id/confirmPasswordEditText"
@@ -46,15 +63,65 @@
             android:layout_height="wrap_content"
             android:hint="Repetir contraseña"
             android:inputType="textPassword"
-            android:padding="12dp" />
+            android:padding="12dp"
+            android:textColor="#1247A4"
+            android:textColorHint="#1247A4"
+            android:background="@drawable/edittext_background"
+            android:elevation="4dp"
+            android:layout_marginBottom="16dp" />
 
         <Button
             android:id="@+id/registerButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Registrarse"
+            android:backgroundTint="#1247A4"
             android:padding="12dp"
             android:layout_marginTop="16dp" />
 
-    </LinearLayout>
-</ScrollView>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="16dp">
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="2dp"
+                    android:layout_weight="1"
+                    android:background="#1247A4" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:text="Continuar con"
+                    android:textColor="#1247A4"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="2dp"
+                    android:layout_weight="1"
+                    android:background="#1247A4" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/googleSignUpButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:backgroundTint="#DB4437"
+            android:text="Regístrate con Google"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:drawableStart="@drawable/ic_google_logo"
+            android:padding="12dp"
+            android:drawablePadding="8dp" />
+
+</LinearLayout>
+

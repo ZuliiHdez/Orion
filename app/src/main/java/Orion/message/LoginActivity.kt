@@ -3,12 +3,17 @@ package Orion.message
 import android.content.Intent
 import android.os.Bundle
 import android.widget.*
+import androidx.activity.result.ActivityResultCallback
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
+    private lateinit var googleSignInHelper: GoogleSignInHelper
+    private lateinit var googleSignInLauncher: ActivityResultLauncher<Intent>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,6 +27,7 @@ class LoginActivity : AppCompatActivity() {
         val registerTextView = findViewById<TextView>(R.id.registerTextView)
         val passwordToggleIcon = findViewById<ImageView>(R.id.passwordToggleIcon)
         val forgotPasswordTextView = findViewById<TextView>(R.id.forgotPasswordTextView)
+        val googleSignInButton = findViewById<com.google.android.gms.common.SignInButton>(R.id.googleSignInButton)
 
         passwordToggleIcon.setImageResource(android.R.drawable.ic_menu_view)
 
@@ -36,6 +42,32 @@ class LoginActivity : AppCompatActivity() {
             passwordEditText.setSelection(passwordEditText.text.length)
         }
 
+        // Inicializa GoogleSignInHelper y ActivityResultLauncher
+        googleSignInLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult(), ActivityResultCallback { result ->
+            googleSignInHelper.handleSignInResult(result.data)
+        })
+
+        googleSignInHelper = GoogleSignInHelper(
+            context = this,
+            auth = auth,
+            activityResultLauncher = googleSignInLauncher,
+            onSignInSuccess = { account ->
+                // Manejar éxito de inicio de sesión
+                Toast.makeText(this, "Bienvenido, ${account.displayName}", Toast.LENGTH_SHORT).show()
+                val intent = Intent(this, MainActivity::class.java)
+                startActivity(intent)
+                finish()
+            },
+            onSignInFailure = { error ->
+                // Manejar error de inicio de sesión
+                Toast.makeText(this, error, Toast.LENGTH_SHORT).show()
+            }
+        )
+
+        googleSignInButton.setOnClickListener {
+            googleSignInHelper.signInWithGoogle()
+        }
+
         loginButton.setOnClickListener {
             val email = emailEditText.text.toString().trim()
             val password = passwordEditText.text.toString().trim()
@@ -46,7 +78,6 @@ class LoginActivity : AppCompatActivity() {
                 loginUser(email, password)
             }
         }
-
         registerTextView.setOnClickListener {
             val intent = Intent(this, RegisterActivity::class.java)
             startActivity(intent)
@@ -75,7 +106,6 @@ class LoginActivity : AppCompatActivity() {
                 }
             }
     }
-
     private fun sendPasswordResetEmail(email: String) {
         auth.sendPasswordResetEmail(email)
             .addOnCompleteListener { task ->

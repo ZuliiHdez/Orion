@@ -1,12 +1,12 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
     android:gravity="center"
     android:background="@drawable/background_radial">
-
 
     <ImageView
         android:id="@+id/profileImageView"
@@ -17,7 +17,6 @@
         android:scaleType="centerCrop"
         android:background="@drawable/circle_background"
         android:src="@drawable/ic_profile_placeholder" />
-
 
     <EditText
         android:id="@+id/emailEditText"
@@ -32,7 +31,6 @@
         android:elevation="4dp"
         android:layout_marginBottom="16dp" />
 
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -44,14 +42,13 @@
 
         <EditText
             android:id="@+id/passwordEditText"
-            android:layout_width="0dp"
+            android:layout_width="325dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:background="@drawable/edittext_background"
             android:hint="Contraseña"
             android:inputType="textPassword"
             android:padding="12dp"
             android:textColor="#1247A4"
-            android:background="@drawable/edittext_background"
             android:textColorHint="#1247A4" />
 
         <ImageView
@@ -61,7 +58,7 @@
             android:layout_marginStart="8dp"
             android:contentDescription="Mostrar/Ocultar Contraseña"
             android:src="@android:drawable/ic_menu_view"
-            android:tint="#1247A4" />
+            app:tint="#1247A4" />
     </LinearLayout>
 
     <TextView
@@ -74,8 +71,7 @@
         android:textColor="#1247A4"
         android:textSize="16sp"
         android:textStyle="bold"
-        android:layout_marginBottom="16dp"/>
-
+        android:layout_marginBottom="16dp" />
 
     <Button
         android:id="@+id/loginButton"
@@ -86,6 +82,43 @@
         android:text="Iniciar sesión"
         android:textColor="#FFFFFF" />
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="16dp">
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="2dp"
+            android:layout_weight="1"
+            android:background="#1247A4" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:text="Continuar con"
+            android:textColor="#1247A4"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="2dp"
+            android:layout_weight="1"
+            android:background="#1247A4" />
+    </LinearLayout>
+
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/googleSignInButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="16dp" />
 
     <TextView
         android:id="@+id/registerTextView"
