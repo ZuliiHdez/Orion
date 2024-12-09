@@ -54,7 +54,7 @@ class LoginActivity : AppCompatActivity() {
             onSignInSuccess = { account ->
                 // Manejar éxito de inicio de sesión
                 Toast.makeText(this, "Bienvenido, ${account.displayName}", Toast.LENGTH_SHORT).show()
-                val intent = Intent(this, MainActivity::class.java)
+                val intent = Intent(this, LoggedMainActivity::class.java)
                 startActivity(intent)
                 finish()
             },
