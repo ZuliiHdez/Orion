@@ -1,27 +1,27 @@
 <LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="16dp"
-        android:gravity="center"
-        android:background="@drawable/background_radial">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:gravity="center"
+    android:background="@drawable/background_radial">
 
         <EditText
             android:id="@+id/usernameEditText"
-            android:layout_width="match_parent"
+            android:layout_width="354dp"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/edittext_background"
+            android:elevation="4dp"
             android:hint="Nombre de usuario"
             android:padding="12dp"
             android:textColor="#1247A4"
-            android:textColorHint="#1247A4"
-            android:background="@drawable/edittext_background"
-            android:elevation="4dp"
-            android:layout_marginBottom="16dp"/>
+            android:textColorHint="#1247A4" />
 
         <EditText
             android:id="@+id/fullNameEditText"
-            android:layout_width="match_parent"
+            android:layout_width="354dp"
             android:layout_height="wrap_content"
             android:hint="Nombre completo"
             android:padding="12dp"
@@ -33,7 +33,7 @@
 
         <EditText
             android:id="@+id/emailEditText"
-            android:layout_width="match_parent"
+            android:layout_width="354dp"
             android:layout_height="wrap_content"
             android:hint="Correo electrónico"
             android:inputType="textEmailAddress"
@@ -46,7 +46,7 @@
 
         <EditText
             android:id="@+id/passwordEditText"
-            android:layout_width="match_parent"
+            android:layout_width="354dp"
             android:layout_height="wrap_content"
             android:hint="Contraseña"
             android:inputType="textPassword"
@@ -59,7 +59,7 @@
 
         <EditText
             android:id="@+id/confirmPasswordEditText"
-            android:layout_width="match_parent"
+            android:layout_width="354dp"
             android:layout_height="wrap_content"
             android:hint="Repetir contraseña"
             android:inputType="textPassword"
@@ -72,7 +72,7 @@
 
         <Button
             android:id="@+id/registerButton"
-            android:layout_width="match_parent"
+            android:layout_width="354dp"
             android:layout_height="wrap_content"
             android:text="Registrarse"
             android:backgroundTint="#1247A4"
@@ -110,18 +110,17 @@
                     android:background="#1247A4" />
         </LinearLayout>
 
-        <Button
-            android:id="@+id/googleSignUpButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+        <!-- Botón de Google como un ícono -->
+        <ImageButton
+            android:id="@+id/googleRegisterButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_google_logo"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Registrarse con Google"
+            android:layout_gravity="center"
             android:layout_marginTop="16dp"
-            android:backgroundTint="#DB4437"
-            android:text="Regístrate con Google"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold"
-            android:drawableStart="@drawable/ic_google_logo"
-            android:padding="12dp"
-            android:drawablePadding="8dp" />
+            android:scaleType="centerInside" />
+
 
 </LinearLayout>
-

@@ -7,6 +7,7 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import androidx.viewpager2.widget.ViewPager2
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 
 class LoggedMainActivity : AppCompatActivity() {
 
@@ -14,20 +15,28 @@ class LoggedMainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_logged_main)
 
-        // Obtén el usuario actual desde Firebase Auth
-        val user = FirebaseAuth.getInstance().currentUser
-        val userName = user?.displayName ?: "Usuario Desconocido"
-
-        // Muestra el nombre del usuario en el TextView
+        val firebaseAuth = FirebaseAuth.getInstance()
+        val userId = firebaseAuth.currentUser?.uid
         val userNameTextView: TextView = findViewById(R.id.userName)
-        userNameTextView.text = userName
-        // Otros componentes en la actividad
+
+        if (userId != null) {
+            val database = FirebaseDatabase.getInstance()
+            database.reference.child("Users").child(userId).get()
+                .addOnSuccessListener { snapshot ->
+                    val fullName = snapshot.child("fullName").value as? String ?: "Usuario Desconocido"
+                    userNameTextView.text = fullName
+                }
+                .addOnFailureListener {
+                    userNameTextView.text = "Error al cargar el nombre"
+                }
+        }
+
+        // Configuración de pestañas y ViewPager
         val tabLayout: TabLayout = findViewById(R.id.tabLayout)
         val viewPager: ViewPager2 = findViewById(R.id.viewPager)
         val adapter = ViewPagerAdapter(this)
         viewPager.adapter = adapter
 
-        // Configuración de pestañas
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             tab.text = when (position) {
                 0 -> "Chats"
@@ -36,5 +45,4 @@ class LoggedMainActivity : AppCompatActivity() {
             }
         }.attach()
     }
-
 }

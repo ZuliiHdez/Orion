@@ -27,7 +27,7 @@ class LoginActivity : AppCompatActivity() {
         val registerTextView = findViewById<TextView>(R.id.registerTextView)
         val passwordToggleIcon = findViewById<ImageView>(R.id.passwordToggleIcon)
         val forgotPasswordTextView = findViewById<TextView>(R.id.forgotPasswordTextView)
-        val googleSignInButton = findViewById<com.google.android.gms.common.SignInButton>(R.id.googleSignInButton)
+        val googleSignInButton = findViewById<ImageButton>(R.id.googleSignInButton)
 
         passwordToggleIcon.setImageResource(android.R.drawable.ic_menu_view)
 
