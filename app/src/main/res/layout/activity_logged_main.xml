@@ -2,20 +2,20 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <!-- Sección superior para perfil y botones -->
     <androidx.constraintlayout.widget.ConstraintLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/light_blue"
         android:paddingStart="16dp"
         android:paddingTop="16dp"
         android:id="@+id/topSection"
-        android:paddingEnd="16dp">
+        android:paddingEnd="16dp"
+        tools:ignore="MissingConstraints">
 
         <!-- Imagen de perfil en la esquina superior izquierda -->
         <ImageView
@@ -69,7 +69,8 @@
             android:id="@+id/searchBar"
             android:layout_width="0dp"
             android:layout_height="35dp"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="20dp"
             android:layout_marginLeft="10dp"
             android:background="@drawable/rounded_edittext"
             android:drawableStart="@drawable/ic_seeker"
@@ -80,9 +81,94 @@
             app:layout_constraintTop_toBottomOf="@id/userStatus"
             app:layout_constraintStart_toEndOf="@id/profileImage"
             app:layout_constraintEnd_toEndOf="parent" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <!-- Contenedor horizontal para los labels con iconos -->
+    <LinearLayout
+        android:id="@+id/labelsContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:background="@color/light_blue"
+        app:layout_constraintTop_toBottomOf="@id/topSection"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Icono y label para Peticiones -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="4dp"
+                android:id="@+id/request_ic"
+                android:src="@drawable/ic_requests"
+                android:contentDescription="Peticiones" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Requests"
+                android:id="@+id/request_text"
+                android:textSize="16sp"
+                android:textColor="@color/black" />
+        </LinearLayout>
+
+        <!-- Espaciador -->
+        <View
+            android:layout_width="16dp"
+            android:layout_height="match_parent" />
+
+        <!-- Icono y label para Añadir contacto -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:orientation="horizontal"
+            android:gravity="center">
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="4dp"
+                android:id="@+id/add_contact_ic"
+                android:src="@drawable/ic_add_contact"
+                android:contentDescription="Añadir contacto" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/add_contact"
+                android:text="Add contact"
+                android:textSize="16sp"
+                android:textColor="@color/black" />
+        </LinearLayout>
+
+        <!-- Espaciador -->
+        <View
+            android:layout_width="16dp"
+            android:layout_height="match_parent" />
+
+        <!-- Icono y label para Crear grupo -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="4dp"
+                android:src="@drawable/ic_add_group"
+                android:contentDescription="Crear grupo" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Add group"
+                android:textSize="16sp"
+                android:textColor="@color/black" />
+        </LinearLayout>
+    </LinearLayout>
 
     <!-- TabLayout para las pestañas -->
     <com.google.android.material.tabs.TabLayout
@@ -94,16 +180,17 @@
         app:tabGravity="fill"
         app:tabIndicatorColor="@color/blue"
         app:tabIndicatorHeight="5dp"
+        android:layout_marginTop="0dp"
         app:tabTextColor="@color/blue"
         app:tabSelectedTextColor="@color/blue"
-        app:layout_constraintTop_toBottomOf="@id/topSection" />
+        app:layout_constraintTop_toBottomOf="@id/labelsContainer" />
 
     <!-- ViewPager para contenido dinámico -->
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="0dp"
         app:layout_constraintTop_toBottomOf="@id/tabLayout"
         app:layout_constraintBottom_toBottomOf="parent" />
 
