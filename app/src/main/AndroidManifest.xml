@@ -27,6 +27,7 @@
         <activity android:name=".LoginActivity" />
         <activity android:name=".RegisterActivity" />
         <activity android:name=".LoggedMainActivity" />
+        <activity android:name=".ChatActivity"/>
     </application>
 
 </manifest>
