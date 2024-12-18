@@ -1,5 +1,7 @@
-package Orion.message
+package Orion.message.model
 
+import Orion.message.ChatActivity
+import Orion.message.R
 import Orion.message.utils.FirebaseUtil // Importamos la clase utilitaria
 import android.content.Intent
 import android.view.LayoutInflater
@@ -8,10 +10,14 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
 
-class ChatAdapter(private val contacts: List<FirebaseUtil.Contact>) : RecyclerView.Adapter<ChatAdapter.ViewHolder>() {
+class ChatAdapter(private var contacts: List<FirebaseUtil.Contact>) : RecyclerView.Adapter<ChatAdapter.ViewHolder>() {
+
+    // Método para actualizar la lista de contactos
+    fun updateContacts(newContacts: List<FirebaseUtil.Contact>) {
+        contacts = newContacts
+        notifyDataSetChanged()  // Notificar al RecyclerView que la lista de datos ha cambiado
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         // Inflar el layout para cada ítem del RecyclerView
@@ -33,7 +39,7 @@ class ChatAdapter(private val contacts: List<FirebaseUtil.Contact>) : RecyclerVi
         private val profileImageView: ImageView = itemView.findViewById(R.id.contactImageView)
 
         fun bind(contact: FirebaseUtil.Contact) {
-            // Asignar el nombre del contacto al TextView
+            // Asignar el nombre completo del contacto al TextView
             nameTextView.text = contact.fullName
             profileImageView.setImageResource(R.drawable.ic_profile_placeholder)
 
@@ -41,10 +47,12 @@ class ChatAdapter(private val contacts: List<FirebaseUtil.Contact>) : RecyclerVi
             itemView.setOnClickListener {
                 val context = itemView.context
                 val intent = Intent(context, ChatActivity::class.java)
-                // Pasar el nombre de usuario del contacto a la ChatActivity
-                intent.putExtra("CONTACT_USERNAME", contact.fullName)
+                // Pasar tanto el nombre de usuario como el nombre completo del contacto a la ChatActivity
+                intent.putExtra("CONTACT_USERNAME", contact.username)
+                intent.putExtra("CONTACT_FULLNAME", contact.fullName)
                 context.startActivity(intent)
             }
         }
     }
 }
+

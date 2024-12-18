@@ -1,5 +1,7 @@
 package Orion.message.utils
 
+import android.util.Log
+import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -15,60 +17,11 @@ object FirebaseUtil {
     data class FriendRequest(val senderName: String)
     private val db = FirebaseFirestore.getInstance()
 
-    // Crea un chatroom si no existe
-    fun createChatRoom(contactUsername: String, currentUserId: String, callback: (chatroomId: String?) -> Unit) {
-        val chatroomId = getChatRoomId(currentUserId, contactUsername)
-
-        // Verifica si la sala de chat ya existe
-        db.collection("chatrooms")
-            .document(chatroomId)
-            .get()
-            .addOnSuccessListener { document ->
-                if (!document.exists()) {
-                    // Si no existe, creamos un nuevo chatroom
-                    val chatroomData = hashMapOf(
-                        "users" to mapOf(
-                            currentUserId to mapOf("username" to "Current User", "lastMessage" to ""),
-                            contactUsername to mapOf("username" to contactUsername, "lastMessage" to "")
-                        ),
-                        "messages" to emptyList<String>()
-                    )
-
-                    // Crear el chatroom en la base de datos
-                    db.collection("chatrooms")
-                        .document(chatroomId)
-                        .set(chatroomData)
-                        .addOnSuccessListener {
-                            callback(chatroomId)  // Devuelve el chatroomId
-                        }
-                        .addOnFailureListener { e ->
-                            callback(null)
-                        }
-                } else {
-                    // Si ya existe, solo devolvemos el chatroomId
-                    callback(chatroomId)
-                }
-            }
-            .addOnFailureListener { exception ->
-                callback(null)
-            }
-    }
-
-    // Función para obtener un ID único para el chatroom
-    private fun getChatRoomId(currentUserId: String, contactUsername: String): String {
-        return if (currentUserId < contactUsername) {
-            currentUserId + "_" + contactUsername
-        } else {
-            contactUsername + "_" + currentUserId
-        }
-    }
-
     // Verificar si el usuario está autenticado
     fun isUserAuthenticated(): Boolean {
         return FirebaseAuth.getInstance().currentUser != null
     }
 
-    fun logout() { FirebaseAuth.getInstance().signOut() }
 
     // Obtener el nombre de usuario actual
     fun getCurrentUsername(callback: (String) -> Unit) {
@@ -231,6 +184,26 @@ object FirebaseUtil {
         })
     }
 
+    fun getUserIdByUsername(username: String, callback: (String?) -> Unit) {
+        val userRef = getDatabaseReference("Users").orderByChild("username").equalTo(username)
+        userRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    // Tomar el primer usuario encontrado con ese nombre de usuario
+                    val userSnapshot = snapshot.children.firstOrNull()
+                    val userId = userSnapshot?.key // El userId es la clave del nodo
+                    callback(userId)
+                } else {
+                    callback(null) // No se encontró el usuario
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                callback(null) // En caso de error, devolver null
+            }
+        })
+    }
+
     fun getUserDetailsByUsername(username: String, callback: (Map<String, Any?>?) -> Unit) {
         val userRef = getDatabaseReference("Users").orderByChild("username").equalTo(username)
         userRef.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -303,43 +276,116 @@ object FirebaseUtil {
         return true
     }
 
+    // Crear un chatroom si no existe
+    fun createChatRoom(chatroomId: String, contactUsername: String, currentUsername: String, callback: (chatroomId: String?) -> Unit) {
+        // Referencia al chatroom
+        val chatroomRef = getDatabaseReference("chatrooms").child(chatroomId)
 
-    fun sendMessageToChat(chatroomId: String, messageText: String, callback: () -> Unit) {
-        val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: return
-        val message = hashMapOf(
-            "senderId" to currentUserId,
-            "text" to messageText,
-            "timestamp" to System.currentTimeMillis(),
-            "type" to "text"
-        )
+        val currentUserId = getCurrentUserId()
+        if (currentUserId == null) {
+            Log.e("createChatRoom", "No se pudo obtener el currentUserId")
+            callback(null)
+            return
+        }
 
-        db.collection("chatrooms")
-            .document(chatroomId)
-            .collection("messages")
-            .add(message)
-            .addOnSuccessListener {
-                callback()  // Llamar al callback cuando el mensaje se haya enviado correctamente
+        // Obtener el ID del contacto de forma asíncrona
+        getUserIdByUsername(contactUsername) { contactId ->
+            if (contactId == null) {
+                Log.e("createChatRoom", "No se pudo encontrar el ID del contacto")
+                callback(null)
+                return@getUserIdByUsername
             }
-            .addOnFailureListener {
-                callback()  // Manejar errores si es necesario
+
+            // Verificar si el chatroom ya existe
+            chatroomRef.get().addOnSuccessListener { snapshot ->
+                if (!snapshot.exists()) {
+                    // Crear un nuevo chatroom
+                    val chatroomData = mapOf(
+                        "users" to mapOf(
+                            currentUserId to mapOf("username" to currentUsername, "state" to "online"),
+                            contactId to mapOf("username" to contactUsername, "state" to "offline")
+                        )
+                    )
+
+                    chatroomRef.setValue(chatroomData).addOnSuccessListener {
+                        callback(chatroomId)
+                    }.addOnFailureListener { e ->
+                        Log.e("createChatRoom", "Error al crear chatroom: ${e.message}")
+                        callback(null)
+                    }
+                } else {
+                    // Si ya existe, devolver el chatroomId
+                    callback(chatroomId)
+                }
+            }.addOnFailureListener { e ->
+                Log.e("createChatRoom", "Error al verificar el chatroom: ${e.message}")
+                callback(null)
             }
+        }
+    }
+
+
+    fun checkChatroomExists(chatroomId: String, callback: (Boolean) -> Unit) {
+        val chatroomRef = FirebaseUtil.getDatabaseReference("chatrooms").child(chatroomId)
+
+        chatroomRef.get().addOnSuccessListener { snapshot ->
+            callback(snapshot.exists()) // Devuelve true si el chatroom existe, false si no
+        }.addOnFailureListener { e ->
+            Log.e("checkChatroomExists", "Error al verificar el chatroom: ${e.message}")
+            callback(false) // En caso de error, devuelve false
+        }
+    }
+
+
+    // Enviar un mensaje al chatroom
+    fun sendMessageToChat(chatroomId: String, message: Message, callback: (Boolean) -> Unit) {
+        val currentUserId = getCurrentUserId()
+        if (currentUserId == null) {
+            Log.e("sendMessage", "Usuario no autenticado.")
+            callback(false)
+            return
+        }
+
+        // Referencia a los mensajes del chatroom
+        val messagesRef = getDatabaseReference("chatrooms").child(chatroomId).child("messages")
+
+        // Crear un nuevo nodo para el mensaje
+        val newMessageRef = messagesRef.push()
+        val messageData = message.toMap()
+
+        newMessageRef.setValue(messageData).addOnSuccessListener {
+            callback(true)
+        }.addOnFailureListener { e ->
+            Log.e("sendMessage", "Error al enviar mensaje: ${e.message}")
+            callback(false)
+        }
     }
 
     // Obtener los mensajes del chatroom
     fun getMessagesForChat(chatroomId: String, callback: (List<Message>) -> Unit) {
-        db.collection("chatrooms")
-            .document(chatroomId)
-            .collection("messages")
-            .orderBy("timestamp")
-            .get()
-            .addOnSuccessListener { querySnapshot ->
+        val messagesRef = FirebaseDatabase.getInstance().getReference("chatrooms").child(chatroomId).child("messages")
+        messagesRef.orderByChild("timestamp").addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
                 val messages = mutableListOf<Message>()
-                querySnapshot.forEach { document ->
-                    val message = document.toObject(Message::class.java)
-                    messages.add(message)
+
+                // Recorrer todas las instancias de "messages" en el snapshot
+                for (child in snapshot.children) {
+                    val message = child.getValue(Message::class.java)  // Deserializa cada mensaje
+                    if (message != null) {
+                        Log.d("getMessagesForChat", "Mensaje: $message")
+                        messages.add(message)  // Agrega el mensaje a la lista
+                    }
                 }
+
+                // Al finalizar la lectura, invoca el callback con la lista de mensajes
                 callback(messages)
             }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e("getMessagesForChat", "Error al obtener mensajes: ${error.message}")
+                callback(emptyList())  // En caso de error, devuelve una lista vacía
+            }
+        })
     }
 
     // Clase de datos Contact para manejar los contactos
@@ -352,8 +398,21 @@ object FirebaseUtil {
     data class Message(
         val senderId: String = "",
         val text: String = "",
-        val timestamp: Long = 0L,
-        val type: String = ""
-    )
+        val type: String = "",
+        val formattedTime: String = "",
+        val timestamp: Long = 0L // Establecemos un valor predeterminado para timestamp
+    ) {
+        // Método para convertir el objeto Message a un mapa (útil para Firebase)
+        fun toMap(): Map<String, Any> {
+            return mapOf(
+                "senderId" to senderId,
+                "text" to text,
+                "timestamp" to timestamp,
+                "type" to type,
+                "formattedTime" to formattedTime
+            )
+        }
+    }
+
 
 }

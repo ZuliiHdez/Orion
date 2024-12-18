@@ -1,7 +1,6 @@
 package Orion.message
 
 import android.os.Bundle
-import android.view.View
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
@@ -9,11 +8,15 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
-import com.bumptech.glide.Glide
 import Orion.message.utils.FirebaseUtil
+import Orion.message.utils.FirebaseUtil.Message
+import Orion.message.utils.FirebaseUtil.getCurrentUsername
+import Orion.message.utils.FirebaseUtil.getUserIdByUsername
+import Orion.message.model.ChatMessagesAdapter
+import Orion.message.utils.FirebaseUtil.checkChatroomExists
+import Orion.message.utils.FirebaseUtil.getCurrentUserId
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class ChatActivity : AppCompatActivity() {
 
@@ -26,8 +29,8 @@ class ChatActivity : AppCompatActivity() {
 
     private lateinit var chatMessagesAdapter: ChatMessagesAdapter
     private lateinit var currentUserId: String
+    private lateinit var currentUserName: String
     private lateinit var chatroomId: String
-    private val firestore = FirebaseFirestore.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,108 +40,118 @@ class ChatActivity : AppCompatActivity() {
         chatUsername = intent.getStringExtra("CONTACT_USERNAME") ?: ""
 
         if (chatUsername.isNotEmpty()) {
-            // Inicializar las vistas
-            recyclerView = findViewById(R.id.chat_recycler_view)
-            chatMessageInput = findViewById(R.id.chat_message_input)
-            sendButton = findViewById(R.id.message_send_btn)
-            otherUsernameTextView = findViewById(R.id.other_username)
-            backButton = findViewById(R.id.back_btn)
+            initializeUI()
 
-            // Mostrar el nombre de usuario del contacto en el Toolbar
-            otherUsernameTextView.text = chatUsername
+            currentUserId = getCurrentUserId()!!
 
-            // Obtener el ID del usuario actual desde Firebase Auth
-            currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+            // Obtener el nombre de usuario actual y continuar si es válido
+            getCurrentUsername { currentUserName ->
+                if (currentUserName == null) {
+                    Toast.makeText(this, "Error: Usuario no identificado", Toast.LENGTH_SHORT).show()
+                    finish() // Terminar la actividad si el nombre de usuario es nulo
+                    return@getCurrentUsername
+                }
 
-            // Obtener o generar un chatroomId basado en los dos usuarios (por ejemplo, usando el ID de ambos usuarios en orden alfabético)
-            chatroomId = generateChatroomId(currentUserId, chatUsername)
+                this.currentUserName = currentUserName
+                val chatFullName = intent.getStringExtra("CONTACT_FULLNAME") ?: ""
 
-            // Configurar RecyclerView
-            recyclerView.layoutManager = LinearLayoutManager(this)
-            recyclerView.setHasFixedSize(true)
-
-            // Inicializar el adaptador
-            chatMessagesAdapter = ChatMessagesAdapter(mutableListOf(), currentUserId)
-            recyclerView.adapter = chatMessagesAdapter
-
-            // Cargar los mensajes del chat
-            loadMessages()
-
-            // Configurar el botón de "enviar" para enviar mensajes
-            sendButton.setOnClickListener {
-                sendMessage()
+                if (chatUsername.isNotEmpty() && chatFullName.isNotEmpty()) {
+                    otherUsernameTextView.text = chatFullName
+                    getUserIdByUsername(chatUsername) { chatUserId ->
+                        if (chatUserId != null) {
+                            chatroomId = generateChatroomId(currentUserId, chatUserId)
+                            setupRecyclerView()
+                            loadMessages()
+                            setupListeners()
+                        } else {
+                            Toast.makeText(this, "Error: Usuario no encontrado", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                } else {
+                    Toast.makeText(this, "Error: Usuario no válido", Toast.LENGTH_SHORT).show()
+                    finish() // Terminar la actividad si los datos son inválidos
+                }
             }
-
-            // Configurar el evento del botón de retroceso
-            backButton.setOnClickListener {
-                onBackPressed() // Volver a la actividad anterior
-            }
-
         } else {
             Toast.makeText(this, "Error: Usuario no válido", Toast.LENGTH_SHORT).show()
+            finish() // Terminar la actividad si no hay un nombre de usuario válido
         }
     }
 
-    private fun loadMessages() {
-        // Cargar los mensajes de la subcolección "messages" del chatroom correspondiente
-        firestore.collection("chatrooms")
-            .document(chatroomId)
-            .collection("messages")
-            .orderBy("timestamp", Query.Direction.ASCENDING) // Ordenar los mensajes por timestamp
-            .get()
-            .addOnSuccessListener { snapshot ->
-                val messages = snapshot.documents.mapNotNull { doc ->
-                    doc.toObject(FirebaseUtil.Message::class.java)
-                }.toMutableList() // Convertimos a MutableList
-
-                // Actualizar el adaptador con los mensajes cargados
-                chatMessagesAdapter = ChatMessagesAdapter(messages, currentUserId)
-                recyclerView.adapter = chatMessagesAdapter
-                recyclerView.smoothScrollToPosition(chatMessagesAdapter.itemCount - 1) // Hacer scroll hacia el último mensaje
-            }
-            .addOnFailureListener {
-                Toast.makeText(this, "No se pudieron cargar los mensajes", Toast.LENGTH_SHORT).show()
-            }
+    private fun initializeUI() {
+        recyclerView = findViewById(R.id.chat_recycler_view)
+        chatMessageInput = findViewById(R.id.chat_message_input)
+        sendButton = findViewById(R.id.message_send_btn)
+        otherUsernameTextView = findViewById(R.id.other_username)
+        backButton = findViewById(R.id.back_btn)
+        otherUsernameTextView.text = chatUsername
     }
 
+    private fun setupRecyclerView() {
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.setHasFixedSize(true)
+        chatMessagesAdapter = ChatMessagesAdapter(mutableListOf(), currentUserId)
+        recyclerView.adapter = chatMessagesAdapter
+    }
+
+    private fun loadMessages() {
+        checkChatroomExists(chatroomId){ exist ->
+            if(exist){
+                    FirebaseUtil.getMessagesForChat(chatroomId) { messages ->
+                        chatMessagesAdapter.updateMessages(messages)
+                        recyclerView.smoothScrollToPosition(chatMessagesAdapter.itemCount - 1)
+                    }
+            } else {
+                Toast.makeText(this, "Error: No se pudo encontrar la sala de chat", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 
     private fun sendMessage() {
         val messageText = chatMessageInput.text.toString().trim()
 
         if (messageText.isNotEmpty()) {
-            val message = FirebaseUtil.Message(
-                senderId = currentUserId,
-                text = messageText,
-                timestamp = System.currentTimeMillis(),
-                type = "text" // Aquí puedes cambiar el tipo según el tipo de mensaje (texto, imagen, etc.)
-            )
-
-            // Guardar el mensaje en Firestore
-            firestore.collection("chatrooms")
-                .document(chatroomId)
-                .collection("messages")
-                .add(message)
-                .addOnSuccessListener {
-                    // Limpiar el campo de texto después de enviar el mensaje
-                    chatMessageInput.text.clear()
-
-                    // Agregar el nuevo mensaje al adaptador
-                    chatMessagesAdapter.addMessage(message)
-
-                    // Hacer scroll hacia el último mensaje
-                    recyclerView.smoothScrollToPosition(chatMessagesAdapter.itemCount - 1)
+            FirebaseUtil.createChatRoom(chatroomId, chatUsername, currentUserName) { chatroomIdResult ->
+                if (chatroomIdResult != null) {
+                    chatroomId = chatroomIdResult
+                    val newMessage = Message(
+                        senderId = currentUserId,
+                        text = messageText,
+                        formattedTime = getFormattedTime(System.currentTimeMillis()),
+                        type = "text",
+                        timestamp = System.currentTimeMillis()
+                    )
+                    FirebaseUtil.sendMessageToChat(chatroomId, newMessage) {
+                        chatMessageInput.text.clear()
+                        //chatMessagesAdapter.addMessage(newMessage)
+                        recyclerView.smoothScrollToPosition(chatMessagesAdapter.itemCount - 1)
+                    }
+                } else {
+                    Toast.makeText(this, "Error al crear la sala de chat", Toast.LENGTH_SHORT).show()
                 }
-                .addOnFailureListener {
-                    Toast.makeText(this, "No se pudo enviar el mensaje", Toast.LENGTH_SHORT).show()
-                }
+            }
         } else {
             Toast.makeText(this, "El mensaje no puede estar vacío", Toast.LENGTH_SHORT).show()
         }
     }
 
-    // Método para generar el chatroomId de manera consistente (orden alfabético de los IDs de los usuarios)
     private fun generateChatroomId(userId1: String, userId2: String): String {
         val sortedIds = listOf(userId1, userId2).sorted()
-        return sortedIds.joinToString("_") // Por ejemplo: userId1_userId2
+        return sortedIds.joinToString("_")
+    }
+
+    fun getFormattedTime(timestamp: Long): String {
+        val sdf = SimpleDateFormat("HH:mm", Locale.getDefault())
+        return sdf.format(timestamp)
+    }
+
+    private fun setupListeners() {
+        sendButton.setOnClickListener {
+            sendMessage()
+        }
+
+        backButton.setOnClickListener {
+            onBackPressed() // Volver a la actividad anterior
+        }
     }
 }
