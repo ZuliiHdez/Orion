@@ -105,6 +105,7 @@
                     android:background="#1247A4" />
 
                 <TextView
+                    android:id="@+id/continueWith"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"

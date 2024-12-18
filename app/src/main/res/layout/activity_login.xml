@@ -62,17 +62,13 @@
             app:tint="#1247A4" />
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/forgotPasswordTextView"
+    <CheckBox
+        android:id="@+id/rememberMeCheckBox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:gravity="center"
-        android:text="¿Has olvidado tu contraseña?"
+        android:text="Remember Me"
         android:textColor="#1247A4"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="16dp" />
+        android:textSize="16sp"/>
 
     <Button
         android:id="@+id/loginButton"
@@ -82,7 +78,20 @@
         android:padding="12dp"
         android:text="Iniciar sesión"
         android:textColor="#FFFFFF"
-        android:textSize="16dp" />
+        android:textSize="16dp"
+        android:layout_marginTop="24dp"/>
+
+    <TextView
+        android:id="@+id/forgotPasswordTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:gravity="center"
+        android:text="¿Has olvidado tu contraseña?"
+        android:textColor="#1247A4"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -99,13 +108,14 @@
             android:background="#1247A4" />
 
         <TextView
+            android:id="@+id/continueWith"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
             android:text="Continuar con"
             android:textColor="#1247A4"
-            android:textSize="14sp"
+            android:textSize="16sp"
             android:textStyle="bold" />
 
         <View
@@ -123,7 +133,7 @@
         android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="Registrarse con Google"
         android:layout_gravity="center"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="20dp"
         android:layout_marginBottom="16dp"
         android:scaleType="centerInside" />
 
@@ -135,7 +145,7 @@
         android:gravity="center"
         android:text="Crea una cuenta"
         android:textColor="#1247A4"
-        android:textSize="16sp"
+        android:textSize="20sp"
         android:textStyle="bold" />
 
 </LinearLayout>
