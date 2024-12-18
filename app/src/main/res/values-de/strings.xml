@@ -1,0 +1,54 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name">Orion</string>
+    <string name="settings" tools:ignore="ExtraTranslation">Einstellungen</string>
+    <string name="change_language">Sprache ändern</string>
+    <string name="privacy_policy">Datenschutzerklärung</string>
+    <string name="block_list">Blockierte Liste</string>
+    <string name="edit_profile">Profil bearbeiten</string>
+    <string name="change_password">Passwort ändern</string>
+    <string name="notification_settings">Benachrichtigungseinstellungen</string>
+    <string name="logout">Abmelden</string>
+
+    <string name="account" tools:ignore="MissingTranslation">Konto</string>
+    <string name="language" tools:ignore="MissingTranslation">Sprache</string>
+    <string name="notification" tools:ignore="MissingTranslation">Benachrichtigungen</string>
+    <string name="privacy" tools:ignore="MissingTranslation">Datenschutz</string>
+    <string name="select_lang" tools:ignore="MissingTranslation">Wählen Sie die neue Sprache</string>
+
+    <string name="email_hint" tools:ignore="ExtraTranslation">E-Mail</string>
+    <string name="password_hint" tools:ignore="ExtraTranslation">Passwort</string>
+    <string name="forgot_password" tools:ignore="ExtraTranslation">Passwort vergessen?</string>
+    <string name="login_button" tools:ignore="ExtraTranslation">Anmelden</string>
+    <string name="register_text" tools:ignore="ExtraTranslation">Konto erstellen</string>
+    <string name="continue_with" tools:ignore="ExtraTranslation">Weiter mit</string>
+    <string name="fill_all_fields" tools:ignore="ExtraTranslation">Bitte füllen Sie alle Felder aus</string>
+    <string name="login_success" tools:ignore="ExtraTranslation">Erfolgreich angemeldet</string>
+    <string name="login_error" tools:ignore="ExtraTranslation">Fehler: %1$s</string>
+    <string name="password_reset_success" tools:ignore="ExtraTranslation">Passwort-Wiederherstellungs-E-Mail an %1$s gesendet</string>
+    <string name="password_reset_error" tools:ignore="ExtraTranslation">Fehler beim Senden der E-Mail: %1$s</string>
+    <string name="welcome_message" tools:ignore="ExtraTranslation">Willkommen, %1$s</string>
+    <string name="enter_email" tools:ignore="ExtraTranslation">Bitte geben Sie Ihre E-Mail-Adresse ein</string>
+
+    <string name="password_strength_error" tools:ignore="ExtraTranslation">Das neue Passwort muss mindestens 8 Zeichen lang sein, einen Großbuchstaben und eine Zahl enthalten.</string>
+
+
+    <string name="default_web_client_id">15600854885-qlit8ffvn9knfblhak7ilj63curuc8vc.apps.googleusercontent.com</string>
+
+    <string name="save">Änderungen speichern</string>
+    <string name="english">Englisch</string>
+    <string name="spanish">Spanisch</string>
+
+    <string name="username_hint" tools:ignore="MissingTranslation">Benutzername</string>
+    <string name="fullname_hint" tools:ignore="MissingTranslation">Vollständiger Name</string>
+    <string name="repeat_password_hint" tools:ignore="MissingTranslation">Passwort wiederholen</string>
+    <string name="register" tools:ignore="MissingTranslation">Registrieren</string>
+    <string name="status_hint" tools:ignore="MissingTranslation">Status</string>
+
+    <string name="current_password_hint" tools:ignore="MissingTranslation">Aktuelles Passwort</string>
+    <string name="new_password_hint" tools:ignore="MissingTranslation">Neues Passwort</string>
+
+    <string name="first_fragment_label">Erstes Fragment</string>
+    <string name="second_fragment_label">Zweites Fragment</string>
+    <string name="next">Weiter</string>
+    <string name="previous">Zurück</string>
+</resources>

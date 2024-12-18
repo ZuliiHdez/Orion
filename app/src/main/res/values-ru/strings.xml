@@ -1,0 +1,54 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name">Orion</string>
+    <string name="settings" tools:ignore="ExtraTranslation">Настройки</string>
+    <string name="change_language">Сменить язык</string>
+    <string name="privacy_policy">Политика конфиденциальности</string>
+    <string name="block_list">Список заблокированных</string>
+    <string name="edit_profile">Редактировать профиль</string>
+    <string name="change_password">Изменить пароль</string>
+    <string name="notification_settings">Настройки уведомлений</string>
+    <string name="logout">Выйти</string>
+
+    <string name="account" tools:ignore="MissingTranslation">Аккаунт</string>
+    <string name="language" tools:ignore="MissingTranslation">Язык</string>
+    <string name="notification" tools:ignore="MissingTranslation">Уведомления</string>
+    <string name="privacy" tools:ignore="MissingTranslation">Конфиденциальность</string>
+    <string name="select_lang">Выберите новый язык</string>
+
+    <string name="email_hint" tools:ignore="ExtraTranslation">Электронная почта</string>
+    <string name="password_hint" tools:ignore="ExtraTranslation">Пароль</string>
+    <string name="forgot_password" tools:ignore="ExtraTranslation">Забыли пароль?</string>
+    <string name="login_button" tools:ignore="ExtraTranslation">Войти</string>
+    <string name="register_text" tools:ignore="ExtraTranslation">Создать аккаунт</string>
+    <string name="continue_with" tools:ignore="ExtraTranslation">Продолжить с</string>
+    <string name="fill_all_fields" tools:ignore="ExtraTranslation">Пожалуйста, заполните все поля</string>
+    <string name="login_success" tools:ignore="ExtraTranslation">Успешный вход</string>
+    <string name="login_error" tools:ignore="ExtraTranslation">Ошибка: %1$s</string>
+    <string name="password_reset_success" tools:ignore="ExtraTranslation">Письмо для сброса пароля отправлено на %1$s</string>
+    <string name="password_reset_error" tools:ignore="ExtraTranslation">Ошибка при отправке письма: %1$s</string>
+    <string name="welcome_message" tools:ignore="ExtraTranslation">Добро пожаловать, %1$s</string>
+    <string name="enter_email" tools:ignore="ExtraTranslation">Пожалуйста, введите ваш email</string>
+
+    <string name="password_strength_error" tools:ignore="ExtraTranslation">Новый пароль должен содержать не менее 8 символов, включать заглавную букву и цифру.</string>
+
+
+    <string name="default_web_client_id">15600854885-qlit8ffvn9knfblhak7ilj63curuc8vc.apps.googleusercontent.com</string>
+
+    <string name="save">Сохранить изменения</string>
+    <string name="english">Английский</string>
+    <string name="spanish">Испанский</string>
+
+    <string name="username_hint" tools:ignore="MissingTranslation">Имя пользователя</string>
+    <string name="fullname_hint" tools:ignore="MissingTranslation">Полное имя</string>
+    <string name="repeat_password_hint" tools:ignore="MissingTranslation">Повторите пароль</string>
+    <string name="register" tools:ignore="MissingTranslation">Зарегистрироваться</string>
+    <string name="status_hint" tools:ignore="MissingTranslation">Статус</string>
+
+    <string name="current_password_hint" tools:ignore="MissingTranslation">Текущий пароль</string>
+    <string name="new_password_hint" tools:ignore="MissingTranslation">Новый пароль</string>
+
+    <string name="first_fragment_label">Первый фрагмент</string>
+    <string name="second_fragment_label">Второй фрагмент</string>
+    <string name="next">Следующий</string>
+    <string name="previous">Предыдущий</string>
+</resources>

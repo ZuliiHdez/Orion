@@ -1,5 +1,8 @@
 package Orion.message
 
+import android.annotation.SuppressLint
+import android.graphics.Color
+import android.content.ClipData
 import android.os.Bundle
 import android.widget.EditText
 import android.widget.ImageView
@@ -8,6 +11,7 @@ import android.widget.Toast
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.widget.LinearLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -127,21 +131,38 @@ class LoggedMainActivity : AppCompatActivity() {
         requestText.setOnClickListener { showFriendRequests() }
     }
 
+    @SuppressLint("ResourceAsColor")
     private fun promptUsername(onUsernameEntered: (String) -> Unit) {
         val dialog = AlertDialog.Builder(this)
-        val input = EditText(this)
-        input.hint = "Ingrese el nombre de usuario"
 
-        val userNameText = TextView(this)
-        userNameText.text = "Tu nombre de usuario: $currentUsername"
+        // EditText para ingresar el nombre de usuario
+        val input = EditText(this).apply {
+            hint = "Ingrese el nombre de usuario"
+            setPadding(16, 16, 16, 16) // Agregar relleno alrededor del texto
+            background = resources.getDrawable(R.drawable.edit_text_background, null) // Establecer fondo personalizado
+            setTextColor(resources.getColor(R.color.black, null)) // Color del texto
+        }
 
-        val linearLayout = android.widget.LinearLayout(this)
-        linearLayout.orientation = android.widget.LinearLayout.VERTICAL
-        linearLayout.addView(userNameText)
-        linearLayout.addView(input)
+        // TextView para mostrar el nombre de usuario actual
+        val userNameText = TextView(this).apply {
+            text = "Tu nombre de usuario: $currentUsername"
+            setPadding(16, 16, 16, 16) // Agregar relleno para que no esté pegado al borde
+            setTextColor(resources.getColor(R.color.blue, null)) // Color del texto
+        }
 
-        dialog.setTitle("Añadir Contacto")
+        // LinearLayout para organizar los elementos
+        val linearLayout = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(24, 24, 24, 24) // Relleno del contenedor
+            addView(userNameText)
+            addView(input)
+        }
+
+        // Configuración del título y la vista del diálogo
+        dialog.setTitle("Añadir Contacto:")
         dialog.setView(linearLayout)
+
+        // Botón positivo (Agregar)
         dialog.setPositiveButton("Agregar") { _, _ ->
             val username = input.text.toString().trim()
             if (username.isNotEmpty()) {
@@ -151,16 +172,29 @@ class LoggedMainActivity : AppCompatActivity() {
             }
         }
 
+        // Copiar nombre de usuario al hacer clic en el TextView
         userNameText.setOnClickListener {
             val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-            val clip = android.content.ClipData.newPlainText("Username", currentUsername)
+            val clip = ClipData.newPlainText("Username", currentUsername)
             clipboard.setPrimaryClip(clip)
             Toast.makeText(this, "Nombre de usuario copiado al portapapeles", Toast.LENGTH_SHORT).show()
         }
 
+        // Botón negativo (Cancelar)
         dialog.setNegativeButton("Cancelar") { dialogInterface, _ -> dialogInterface.dismiss() }
-        dialog.show()
+
+        // Mostrar el diálogo
+        val alertDialog = dialog.create()
+        alertDialog.show()
+
+        // Cambiar el color del texto del botón "Agregar" a azul
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.parseColor("#1247A4")) // Color azul
+
+        // Cambiar el color del texto del botón "Cancelar" a rojo
+        alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.parseColor("#FF0000")) // Color rojo
     }
+
+
 
     private fun showFriendRequestDialog(friendRequestManager: FriendRequestManager) {
         val recyclerView = RecyclerView(this).apply {
@@ -169,10 +203,15 @@ class LoggedMainActivity : AppCompatActivity() {
 
         friendRequestManager.fetchFriendRequests(recyclerView)
 
-        AlertDialog.Builder(this)
+        val dialog = AlertDialog.Builder(this)
             .setTitle("Solicitudes de Amistad")
             .setView(recyclerView)
             .setNegativeButton("Cerrar") { dialog, _ -> dialog.dismiss() }
             .show()
+
+        // Cambiar el color del texto del botón "Cerrar" a rojo
+        val negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+        negativeButton.setTextColor(Color.parseColor("#FF0000")) // Establece el color rojo
     }
+
 }

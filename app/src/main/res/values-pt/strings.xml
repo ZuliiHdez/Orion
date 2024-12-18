@@ -1,0 +1,54 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name">Orion</string>
+    <string name="settings" tools:ignore="ExtraTranslation">Configurações</string>
+    <string name="change_language">Mudar Idioma</string>
+    <string name="privacy_policy">Política de Privacidade</string>
+    <string name="block_list">Lista de Bloqueados</string>
+    <string name="edit_profile">Editar Perfil</string>
+    <string name="change_password">Alterar Senha</string>
+    <string name="notification_settings">Configurações de Notificações</string>
+    <string name="logout">Sair</string>
+
+    <string name="account" tools:ignore="MissingTranslation">Conta</string>
+    <string name="language" tools:ignore="MissingTranslation">Idioma</string>
+    <string name="notification" tools:ignore="MissingTranslation">Notificações</string>
+    <string name="privacy" tools:ignore="MissingTranslation">Privacidade</string>
+    <string name="select_lang">Selecione o Novo Idioma</string>
+
+    <string name="email_hint" tools:ignore="ExtraTranslation">Email</string>
+    <string name="password_hint" tools:ignore="ExtraTranslation">Senha</string>
+    <string name="forgot_password" tools:ignore="ExtraTranslation">Esqueceu sua senha?</string>
+    <string name="login_button" tools:ignore="ExtraTranslation">Entrar</string>
+    <string name="register_text" tools:ignore="ExtraTranslation">Criar uma Conta</string>
+    <string name="continue_with" tools:ignore="ExtraTranslation">Continuar com</string>
+    <string name="fill_all_fields" tools:ignore="ExtraTranslation">Por favor, preencha todos os campos</string>
+    <string name="login_success" tools:ignore="ExtraTranslation">Login bem-sucedido</string>
+    <string name="login_error" tools:ignore="ExtraTranslation">Erro: %1$s</string>
+    <string name="password_reset_success" tools:ignore="ExtraTranslation">E-mail de redefinição enviado para %1$s</string>
+    <string name="password_reset_error" tools:ignore="ExtraTranslation">Erro ao enviar o e-mail: %1$s</string>
+    <string name="welcome_message" tools:ignore="ExtraTranslation">Bem-vindo, %1$s</string>
+    <string name="enter_email" tools:ignore="ExtraTranslation">Por favor, insira seu e-mail</string>
+
+    <string name="password_strength_error" tools:ignore="ExtraTranslation">A nova senha deve ter pelo menos 8 caracteres, uma letra maiúscula e um número.</string>
+
+
+    <string name="default_web_client_id">15600854885-qlit8ffvn9knfblhak7ilj63curuc8vc.apps.googleusercontent.com</string>
+
+    <string name="save">Salvar Alterações</string>
+    <string name="english">Inglês</string>
+    <string name="spanish">Espanhol</string>
+
+    <string name="username_hint" tools:ignore="MissingTranslation">Nome de Usuário</string>
+    <string name="fullname_hint" tools:ignore="MissingTranslation">Nome Completo</string>
+    <string name="repeat_password_hint" tools:ignore="MissingTranslation">Repetir Senha</string>
+    <string name="register" tools:ignore="MissingTranslation">Registrar</string>
+    <string name="status_hint" tools:ignore="MissingTranslation">Status</string>
+
+    <string name="current_password_hint" tools:ignore="MissingTranslation">Senha Atual</string>
+    <string name="new_password_hint" tools:ignore="MissingTranslation">Nova Senha</string>
+
+    <string name="first_fragment_label">Primeiro Fragmento</string>
+    <string name="second_fragment_label">Segundo Fragmento</string>
+    <string name="next">Próximo</string>
+    <string name="previous">Anterior</string>
+</resources>

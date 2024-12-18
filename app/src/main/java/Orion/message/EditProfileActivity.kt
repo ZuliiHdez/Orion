@@ -45,6 +45,12 @@ class EditProfileActivity : AppCompatActivity() {
         emailEditText = findViewById(R.id.emailEditText)
         saveButton = findViewById(R.id.saveButton)
 
+        fullNameEditText.hint = getString(R.string.fullname_hint)
+        usernameEditText.hint = getString(R.string.username_hint)
+        statusEditText.hint = getString(R.string.status_hint)
+        emailEditText.hint = getString(R.string.email_hint)
+        saveButton.text = getString(R.string.save)
+
         // Cargar datos del usuario
         if (userId != null) {
             databaseReference.child(userId).get().addOnSuccessListener { snapshot ->

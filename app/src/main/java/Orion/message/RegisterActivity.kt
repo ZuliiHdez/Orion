@@ -1,11 +1,13 @@
 package Orion.message
 
 import Orion.message.auth.GoogleAuthHelper
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
@@ -13,13 +15,13 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
-import com.google.firebase.auth.GoogleAuthProvider
 
 class RegisterActivity : AppCompatActivity() {
 
     private lateinit var firebaseAuth: FirebaseAuth
     private val RC_SIGN_IN = 100 // Código de solicitud para Google Sign-In
 
+    @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
@@ -33,6 +35,16 @@ class RegisterActivity : AppCompatActivity() {
         val passwordEditText = findViewById<EditText>(R.id.passwordEditText)
         val registerButton = findViewById<Button>(R.id.registerButton)
         val googleRegisterButton = findViewById<ImageButton>(R.id.googleRegisterButton)
+        val continueWith = findViewById<TextView>(R.id.continueWith)
+        val confirmPasswordEditText = findViewById<EditText>(R.id.confirmPasswordEditText)
+
+        usernameEditText.hint = getString(R.string.username_hint)
+        fullNameEditText.hint = getString(R.string.fullname_hint)
+        emailEditText.hint = getString(R.string.email_hint)
+        passwordEditText.hint = getString(R.string.password_hint)
+        registerButton.text = getString(R.string.register)
+        continueWith.text = getString(R.string.continue_with)
+        confirmPasswordEditText.hint = getString(R.string.repeat_password_hint)
 
         // Configuración para Google Sign-In
         googleRegisterButton.setOnClickListener {
@@ -46,85 +58,104 @@ class RegisterActivity : AppCompatActivity() {
             val fullName = fullNameEditText.text.toString().trim()
             val email = emailEditText.text.toString().trim()
             val password = passwordEditText.text.toString().trim()
+            val confirmPassword = confirmPasswordEditText.text.toString().trim()
 
             if (email.isNotEmpty() && password.isNotEmpty() && fullName.isNotEmpty() && username.isNotEmpty()) {
-                val databaseReference = FirebaseDatabase.getInstance().reference.child("Users")
+                if (password == confirmPassword) {
+                    if (isPasswordStrong(password)) {
+                        val databaseReference = FirebaseDatabase.getInstance().reference.child("Users")
 
-                // Verificar si el nombre de usuario ya existe
-                databaseReference.orderByChild("username").equalTo(username)
-                    .addListenerForSingleValueEvent(object : ValueEventListener {
-                        override fun onDataChange(snapshot: DataSnapshot) {
-                            if (snapshot.exists()) {
-                                // Nombre de usuario ya registrado
-                                Toast.makeText(
-                                    this@RegisterActivity,
-                                    "El nombre de usuario ya está en uso.",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            } else {
-                                // Registrar al usuario
-                                firebaseAuth.createUserWithEmailAndPassword(email, password)
-                                    .addOnCompleteListener { task ->
-                                        if (task.isSuccessful) {
-                                            val userId = firebaseAuth.currentUser?.uid
-                                            if (userId != null) {
-                                                val userMap = mapOf(
-                                                    "username" to username,
-                                                    "fullName" to fullName,
-                                                    "email" to email
-                                                )
+                        // Verificar si el nombre de usuario ya existe
+                        databaseReference.orderByChild("username").equalTo(username)
+                            .addListenerForSingleValueEvent(object : ValueEventListener {
+                                override fun onDataChange(snapshot: DataSnapshot) {
+                                    if (snapshot.exists()) {
+                                        // Nombre de usuario ya registrado
+                                        Toast.makeText(
+                                            this@RegisterActivity,
+                                            "El nombre de usuario ya está en uso.",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    } else {
+                                        // Registrar al usuario
+                                        firebaseAuth.createUserWithEmailAndPassword(email, password)
+                                            .addOnCompleteListener { task ->
+                                                if (task.isSuccessful) {
+                                                    val userId = firebaseAuth.currentUser?.uid
+                                                    if (userId != null) {
+                                                        val userMap = mapOf(
+                                                            "username" to username,
+                                                            "fullName" to fullName,
+                                                            "email" to email
+                                                        )
 
-                                                // Guardar los datos del usuario en el nodo correspondiente
-                                                FirebaseDatabase.getInstance()
-                                                    .reference.child("Users")
-                                                    .child(userId)  // Asegúrate de usar el userId correctamente
-                                                    .setValue(userMap)
-                                                    .addOnCompleteListener { saveTask ->
-                                                        if (saveTask.isSuccessful) {
-                                                            Toast.makeText(
-                                                                this@RegisterActivity,
-                                                                "Registro exitoso",
-                                                                Toast.LENGTH_SHORT
-                                                            ).show()
-                                                            startActivity(
-                                                                Intent(
-                                                                    this@RegisterActivity,
-                                                                    LoginActivity::class.java
-                                                                )
-                                                            )
-                                                            finish()
-                                                        } else {
-                                                            Toast.makeText(
-                                                                this@RegisterActivity,
-                                                                "Error al guardar datos: ${saveTask.exception?.message}",
-                                                                Toast.LENGTH_SHORT
-                                                            ).show()
-                                                        }
+                                                        // Guardar los datos del usuario en el nodo correspondiente
+                                                        FirebaseDatabase.getInstance()
+                                                            .reference.child("Users")
+                                                            .child(userId)
+                                                            .setValue(userMap)
+                                                            .addOnCompleteListener { saveTask ->
+                                                                if (saveTask.isSuccessful) {
+                                                                    Toast.makeText(
+                                                                        this@RegisterActivity,
+                                                                        "Registro exitoso",
+                                                                        Toast.LENGTH_SHORT
+                                                                    ).show()
+                                                                    startActivity(
+                                                                        Intent(
+                                                                            this@RegisterActivity,
+                                                                            LoginActivity::class.java
+                                                                        )
+                                                                    )
+                                                                    finish()
+                                                                } else {
+                                                                    Toast.makeText(
+                                                                        this@RegisterActivity,
+                                                                        "Error al guardar datos: ${saveTask.exception?.message}",
+                                                                        Toast.LENGTH_SHORT
+                                                                    ).show()
+                                                                }
+                                                            }
                                                     }
+                                                } else {
+                                                    Toast.makeText(
+                                                        this@RegisterActivity,
+                                                        "Error: ${task.exception?.message}",
+                                                        Toast.LENGTH_SHORT
+                                                    ).show()
+                                                }
                                             }
-                                        } else {
-                                            Toast.makeText(
-                                                this@RegisterActivity,
-                                                "Error: ${task.exception?.message}",
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                        }
                                     }
-                            }
-                        }
+                                }
 
-                        override fun onCancelled(error: DatabaseError) {
-                            Toast.makeText(
-                                this@RegisterActivity,
-                                "Error al verificar el nombre de usuario: ${error.message}",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    })
+                                override fun onCancelled(error: DatabaseError) {
+                                    Toast.makeText(
+                                        this@RegisterActivity,
+                                        "Error al verificar el nombre de usuario: ${error.message}",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            })
+                    } else {
+                        Toast.makeText(
+                            this,
+                            "La contraseña debe tener al menos 8 caracteres, una letra mayúscula y un número.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                } else {
+                    Toast.makeText(this, "Las contraseñas no coinciden", Toast.LENGTH_SHORT).show()
+                }
             } else {
                 Toast.makeText(this, "Por favor, completa todos los campos", Toast.LENGTH_SHORT).show()
             }
         }
+    }
+
+    
+    private fun isPasswordStrong(password: String): Boolean {
+        val passwordPattern = "^(?=.*[A-Z])(?=.*\\d)[A-Za-z\\d]{8,}$"
+        return password.matches(passwordPattern.toRegex())
     }
 
     // Resultados de Google Sign-In

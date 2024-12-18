@@ -1,19 +1,31 @@
 package Orion.message
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 
 class SettingsActivity : AppCompatActivity() {
 
+    private lateinit var sharedPreferences: SharedPreferences
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
 
+        // Inicializar SharedPreferences
+        sharedPreferences = getSharedPreferences("AppSettings", MODE_PRIVATE)
+
         // Obtener referencias a los botones
+        val privacyTitle = findViewById<TextView>(R.id.privacyTitle)
+        val accountTitle = findViewById<TextView>(R.id.accountTitle)
+        val languageTitle = findViewById<TextView>(R.id.languageTitle)
+        val notificationTitle = findViewById<TextView>(R.id.notificationTitle)
+
         val privacyPolicyButton = findViewById<Button>(R.id.privacyPolicyButton)
         val blockListButton = findViewById<Button>(R.id.blockListButton)
         val editProfileButton = findViewById<Button>(R.id.editProfileButton)
@@ -21,6 +33,20 @@ class SettingsActivity : AppCompatActivity() {
         val notificationSettingsButton = findViewById<Button>(R.id.notificationSettingsButton)
         val changeLanguageButton = findViewById<Button>(R.id.changeLanguageButton)
         val logoutButton = findViewById<Button>(R.id.logoutButton)
+
+        // Configuración de textos
+        privacyPolicyButton.text = getString(R.string.privacy_policy)
+        blockListButton.text = getString(R.string.block_list)
+        editProfileButton.text = getString(R.string.edit_profile)
+        changePasswordButton.text = getString(R.string.change_password)
+        notificationSettingsButton.text = getString(R.string.notification_settings)
+        changeLanguageButton.text = getString(R.string.change_language)
+        logoutButton.text = getString(R.string.logout)
+
+        privacyTitle.text = getString(R.string.privacy)
+        accountTitle.text = getString(R.string.account)
+        languageTitle.text = getString(R.string.language)
+        notificationTitle.text = getString(R.string.notification)
 
         // Manejo de clics para cada botón
         privacyPolicyButton.setOnClickListener {
@@ -35,12 +61,10 @@ class SettingsActivity : AppCompatActivity() {
 
         editProfileButton.setOnClickListener {
             startActivity(Intent(this, EditProfileActivity::class.java))
-
         }
 
         changePasswordButton.setOnClickListener {
             startActivity(Intent(this, ChangePasswordActivity::class.java))
-
         }
 
         notificationSettingsButton.setOnClickListener {
@@ -49,15 +73,26 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         changeLanguageButton.setOnClickListener {
-            Toast.makeText(this, "Cambiar Idioma", Toast.LENGTH_SHORT).show()
-            // Aquí puedes implementar la lógica para cambiar el idioma
+            startActivity(Intent(this, ChangeLanguageActivity::class.java))
         }
 
+        // Botón Logout
         logoutButton.setOnClickListener {
+            // Cerrar sesión en Firebase
             FirebaseAuth.getInstance().signOut()
+
+            // Borrar las credenciales guardadas en SharedPreferences
+            val editor = sharedPreferences.edit()
+            editor.remove("email")
+            editor.remove("password")
+            editor.apply()
+
+            // Mostrar mensaje de sesión cerrada
             Toast.makeText(this, "Sesión Cerrada", Toast.LENGTH_SHORT).show()
+
+            // Redirigir a LoginActivity
             startActivity(Intent(this, LoginActivity::class.java))
-            finish()
+            finish() // Finaliza SettingsActivity
         }
     }
 }

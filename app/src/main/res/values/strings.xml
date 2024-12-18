@@ -1,8 +1,51 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Orion</string>
-    <string name="action_settings">Settings</string>
-    <!-- Strings used for fragments for navigation -->
+    <string name="action_settings" tools:ignore="MissingTranslation">Settings</string>
+    <string name="change_language">Change Language</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="block_list">Block List</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="change_password">Change Password</string>
+    <string name="notification_settings">Notification Settings</string>
+    <string name="logout">Log Out</string>
+
+    <string name="account" tools:ignore="MissingTranslation">Account</string>
+    <string name="language" tools:ignore="MissingTranslation">Language</string>
+    <string name="notification" tools:ignore="MissingTranslation">Notifications</string>
+    <string name="privacy" tools:ignore="MissingTranslation">Privacy</string>
+    <string name="select_lang" tools:ignore="MissingTranslation">Select the New Language</string>
+
+    <string name="email_hint">Email</string>
+    <string name="password_hint">Password</string>
+    <string name="forgot_password">Forgot your password?</string>
+    <string name="login_button">Log In</string>
+    <string name="register_text">Create an account</string>
+    <string name="continue_with">Continue with</string>
+    <string name="fill_all_fields">Please fill in all the fields</string>
+    <string name="login_success">Login successful</string>
+    <string name="login_error">Error: %1$s</string>
+    <string name="password_reset_success">Password reset email sent to %1$s</string>
+    <string name="password_reset_error">Error sending email: %1$s</string>
+    <string name="welcome_message">Welcome, %1$s</string>
+    <string name="enter_email">Please enter your email</string>
+
+    <string name="save" tools:ignore="MissingTranslation">Save Changes</string>
+    <string name="english" tools:ignore="MissingTranslation">English</string>
+    <string name="spanish" tools:ignore="MissingTranslation">Español</string>
+
+    <string name="password_strength_error" tools:ignore="ExtraTranslation">The new password must be at least 8 characters long, contain an uppercase letter, and a number.</string>
+
+
     <string name="default_web_client_id">15600854885-qlit8ffvn9knfblhak7ilj63curuc8vc.apps.googleusercontent.com</string>
+
+    <string name="username_hint" tools:ignore="MissingTranslation">Username</string>
+    <string name="fullname_hint" tools:ignore="MissingTranslation">Full Name</string>
+    <string name="repeat_password_hint" tools:ignore="MissingTranslation">Confirm Password</string>
+    <string name="register" tools:ignore="MissingTranslation">Register</string>
+    <string name="status_hint" tools:ignore="MissingTranslation">Status</string>
+
+    <string name="current_password_hint" tools:ignore="MissingTranslation"> Current Password</string>
+    <string name="new_password_hint" tools:ignore="MissingTranslation">New Password</string>
 
     <string name="first_fragment_label">First Fragment</string>
     <string name="second_fragment_label">Second Fragment</string>
