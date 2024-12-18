@@ -2,10 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
     <application
+        android:name=".OrionClass"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -15,19 +13,58 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Orion"
         tools:targetApi="31">
+
+        <!-- Activity principal -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.Orion">
+            android:theme="@style/Theme.Orion"
+            android:configChanges="locale|layoutDirection">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".LoginActivity" />
-        <activity android:name=".RegisterActivity" />
-        <activity android:name=".LoggedMainActivity" />
+
+        <!-- Login Activity -->
+        <activity
+            android:name=".LoginActivity"
+            android:configChanges="locale|layoutDirection" />
+
         <activity android:name=".ChatActivity"/>
+
+
+        <!-- Registro Activity -->
+        <activity
+            android:name=".RegisterActivity"
+            android:configChanges="locale|layoutDirection" />
+
+        <!-- Actividad principal después de iniciar sesión -->
+        <activity
+            android:name=".LoggedMainActivity"
+            android:configChanges="locale|layoutDirection" />
+
+        <!-- Configuración -->
+        <activity
+            android:name=".SettingsActivity"
+            android:configChanges="locale|layoutDirection" />
+
+        <!-- Editar perfil -->
+        <activity
+            android:name=".EditProfileActivity"
+            android:configChanges="locale|layoutDirection" />
+
+        <!-- Cambiar contraseña -->
+        <activity
+            android:name=".ChangePasswordActivity"
+            android:configChanges="locale|layoutDirection" />
+
+        <activity
+            android:name=".ChangeLanguageActivity"
+            android:configChanges="locale|layoutDirection" />
+
+
+
     </application>
 
 </manifest>
