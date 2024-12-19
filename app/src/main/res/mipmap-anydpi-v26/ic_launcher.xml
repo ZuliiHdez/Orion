@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Capa de fondo -->
-    <background android:drawable="@drawable/ic_icon_launcher" />
-
-    <!-- Capa de primer plano -->
-    <foreground android:drawable="@drawable/ic_icon_launcher" />
-</adaptive-icon>
