@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -14,9 +15,7 @@
             android:text="Cuenta"
             android:textStyle="bold"
             android:textSize="18sp"
-            android:paddingVertical="8dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"/>
+            android:paddingVertical="8dp" />
 
         <Button
             android:scaleType="centerCrop"
@@ -25,8 +24,7 @@
             android:id="@+id/editProfileButton"
             android:text="Editar Perfil"
             android:backgroundTint="#1247A4"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"/>
+            android:layout_marginTop="16dp" />
 
         <Button
             android:id="@+id/changePasswordButton"
@@ -34,8 +32,7 @@
             android:layout_height="wrap_content"
             android:text="Cambiar Contraseña"
             android:backgroundTint="#1247A4"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"/>
+            android:layout_marginTop="16dp" />
 
         <TextView
             android:id="@+id/notificationTitle"
@@ -45,8 +42,7 @@
             android:textStyle="bold"
             android:textSize="18sp"
             android:paddingVertical="8dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"/>
+            android:layout_marginTop="16dp" />
 
         <Button
             android:id="@+id/notificationSettingsButton"
@@ -54,8 +50,7 @@
             android:layout_height="wrap_content"
             android:text="Configuración de Notificaciones"
             android:backgroundTint="#1247A4"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"/>
+            android:layout_marginTop="16dp" />
 
         <TextView
             android:id="@+id/languageTitle"
@@ -65,8 +60,7 @@
             android:textStyle="bold"
             android:textSize="18sp"
             android:paddingVertical="8dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"/>
+            android:layout_marginTop="16dp" />
 
         <Button
             android:id="@+id/changeLanguageButton"
@@ -74,8 +68,7 @@
             android:layout_height="wrap_content"
             android:text="Cambiar Idioma"
             android:backgroundTint="#1247A4"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"/>
+            android:layout_marginTop="16dp" />
 
         <TextView
             android:id="@+id/privacyTitle"
@@ -85,8 +78,7 @@
             android:textStyle="bold"
             android:textSize="18sp"
             android:paddingVertical="8dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"/>
+            android:layout_marginTop="16dp" />
 
         <Button
             android:id="@+id/privacyPolicyButton"
@@ -94,8 +86,7 @@
             android:layout_height="wrap_content"
             android:text="Política de Privacidad"
             android:backgroundTint="#1247A4"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"/>
+            android:layout_marginTop="16dp" />
 
         <Button
             android:id="@+id/blockListButton"
@@ -103,8 +94,7 @@
             android:layout_height="wrap_content"
             android:text="Lista de Bloqueados"
             android:backgroundTint="#1247A4"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"/>
+            android:layout_marginTop="16dp" />
 
 
         <Button
@@ -114,7 +104,16 @@
             android:text="Cerrar Sesión"
             android:textColor="@color/white"
             android:backgroundTint="#FF0000"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="16dp"/>
+            android:layout_marginTop="32dp"/>
+
+        <ImageButton
+            android:id="@+id/backButton"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Atras"
+            android:gravity="start"
+            android:src="@drawable/ic_back"
+            android:layout_marginTop="46dp"/>
 
     </LinearLayout>

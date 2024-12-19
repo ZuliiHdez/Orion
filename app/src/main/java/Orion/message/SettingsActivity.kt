@@ -4,6 +4,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -47,6 +48,13 @@ class SettingsActivity : AppCompatActivity() {
         accountTitle.text = getString(R.string.account)
         languageTitle.text = getString(R.string.language)
         notificationTitle.text = getString(R.string.notification)
+
+        val backButton = findViewById<ImageButton>(R.id.backButton)
+        backButton.setOnClickListener {
+            // Volver a la actividad anterior (LoggedMainActivity)
+            startActivity(Intent(this, LoggedMainActivity::class.java))
+            finish() // Cerrar SettingsActivity
+        }
 
         // Manejo de clics para cada botón
         privacyPolicyButton.setOnClickListener {

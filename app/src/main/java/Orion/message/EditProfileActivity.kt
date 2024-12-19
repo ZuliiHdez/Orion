@@ -7,8 +7,10 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Base64
 import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
@@ -16,7 +18,6 @@ import com.google.android.material.imageview.ShapeableImageView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import java.io.ByteArrayOutputStream
-import java.io.File
 
 class EditProfileActivity : AppCompatActivity() {
 
@@ -32,6 +33,8 @@ class EditProfileActivity : AppCompatActivity() {
     private val db = FirebaseUtil.getDatabaseReference("Users")
     private val userId = FirebaseUtil.getCurrentUserId()
     private val PICK_IMAGE_REQUEST = 101
+    private val CAPTURE_IMAGE_REQUEST = 102
+    private val DELETE_IMAGE_REQUEST = 103
     private var imageUri: Uri? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,53 +57,28 @@ class EditProfileActivity : AppCompatActivity() {
                 val status = snapshot.child("status").value as? String ?: ""
                 val email = snapshot.child("email").value as? String ?: ""
 
-
                 fullNameEditText.setText(fullName)
                 usernameEditText.setText(username)
                 statusEditText.setText(status)
                 emailEditText.setText(email)
 
-                // Primero, verificamos si el usuario tiene una imagen de perfil
-                FirebaseUtil.checkIfUserHasImage(username, // Reemplaza con el nombre de usuario que desees
-                    callback = { hasImage ->
-                        if (hasImage) {
-                            // Si el usuario tiene una imagen, la cargamos
-                            FirebaseUtil.loadUserProfileImage(this@EditProfileActivity, username) { imageFile ->
-                                // Verificamos si tenemos un archivo de imagen
-                                imageFile?.let {
-                                    // Usamos Glide para cargar la imagen desde el archivo
-                                    Glide.with(this@EditProfileActivity)
-                                        .load(it)  // Cargar el archivo de imagen
-                                        .apply(RequestOptions.circleCropTransform())  // Transformación circular
-                                        .into(profileImageView)  // Colocamos la imagen en el ImageView
-                                } ?: run {
-                                    // Si no se encuentra la imagen, mostramos un error
-                                    Toast.makeText(this@EditProfileActivity, "No se encontró la imagen", Toast.LENGTH_SHORT).show()
-                                }
-                            }
-                        } else {
-                            // Si el usuario no tiene imagen de perfil, mostramos un mensaje
-                            Toast.makeText(this@EditProfileActivity, "No hay imagen", Toast.LENGTH_SHORT).show()
-                        }
-                    },
-                    onError = { errorMessage ->
-                        // En caso de error, mostramos un mensaje
-                        Toast.makeText(this@EditProfileActivity, errorMessage, Toast.LENGTH_SHORT).show()
+                FirebaseUtil.loadUserProfileImage(this, username) { imageFile ->
+                    imageFile?.let {
+                        Glide.with(this)
+                            .load(it)
+                            .apply(RequestOptions.circleCropTransform())
+                            .into(profileImageView)
                     }
-                )
-
-
+                }
             }
         }
 
-        // Hacer clic en el ícono de edición para cambiar la foto
+        // Abrir el diálogo para cambiar la foto de perfil
         editIcon.setOnClickListener {
-            val intent = Intent(Intent.ACTION_PICK)
-            intent.type = "image/*"
-            startActivityForResult(intent, PICK_IMAGE_REQUEST)
+            showImageSelectionDialog()
         }
 
-        // Guardar cambios
+        // Guardar cambios de perfil
         saveButton.setOnClickListener {
             val fullName = fullNameEditText.text.toString().trim()
             val status = statusEditText.text.toString().trim()
@@ -117,10 +95,7 @@ class EditProfileActivity : AppCompatActivity() {
                     if (task.isSuccessful) {
                         Toast.makeText(this, "Perfil actualizado correctamente", Toast.LENGTH_SHORT).show()
                         uploadProfileImage()
-
-                        // Regresar a la actividad anterior después de guardar los cambios
-                        finish()
-                    } else {
+                        finish()                    } else {
                         Toast.makeText(this, "Error al actualizar el perfil: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                     }
                 }
@@ -128,56 +103,96 @@ class EditProfileActivity : AppCompatActivity() {
                 Toast.makeText(this, "Por favor, llena todos los campos", Toast.LENGTH_SHORT).show()
             }
         }
-
     }
 
+    // Muestra un diálogo para seleccionar entre opciones
+    private fun showImageSelectionDialog() {
+        val options = arrayOf("Tomar una foto", "Elegir de la galería", "Eliminar foto actual")
+
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Selecciona una opción")
+            .setItems(options) { dialog, which ->
+                when (which) {
+                    0 -> takePhoto() // Tomar una foto con la cámara
+                    1 -> choosePhoto() // Elegir una foto desde la galería
+                    2 -> removePhoto() // Eliminar la foto actual
+                }
+            }
+        builder.show()
+    }
+
+    // Tomar una foto con la cámara
+    private fun takePhoto() {
+        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        startActivityForResult(intent, CAPTURE_IMAGE_REQUEST)
+    }
+
+    // Elegir una foto desde la galería
+    private fun choosePhoto() {
+        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        intent.type = "image/*"
+        startActivityForResult(intent, PICK_IMAGE_REQUEST)
+    }
+
+    // Eliminar la foto actual y poner la imagen por defecto
+    private fun removePhoto() {
+        profileImageView.setImageResource(R.drawable.ic_profile_placeholder) // Imagen por defecto
+        FirebaseUtil.deleteUserProfileImageFromDatabase(this) // Eliminar la imagen en Firebase
+    }
+
+    // Al recibir la respuesta de la actividad
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK && data != null) {
-            imageUri = data.data
-            profileImageView.setImageURI(imageUri)
+        if (resultCode == Activity.RESULT_OK) {
+            when (requestCode) {
+                PICK_IMAGE_REQUEST -> {
+                    imageUri = data?.data
+                    profileImageView.setImageURI(imageUri)
+                    uploadProfileImage()
+                }
+                CAPTURE_IMAGE_REQUEST -> {
+                    val photo = data?.extras?.get("data") as Bitmap
+                    imageUri = getImageUri(photo)
+                    profileImageView.setImageBitmap(photo)
+                    uploadProfileImage()
+                }
+            }
         }
     }
 
+    private fun getImageUri(photo: Bitmap): Uri {
+        val path = MediaStore.Images.Media.insertImage(contentResolver, photo, "profile_photo", null)
+        return Uri.parse(path)
+    }
+
+    // Subir la imagen a Firebase
     private fun uploadProfileImage() {
         imageUri?.let { uri ->
-            try {
-                // Convertir la imagen a Base64
-                val base64Image = convertImageToBase64(uri)
+            contentResolver.openInputStream(uri)?.let { inputStream ->
+                val bitmap = BitmapFactory.decodeStream(inputStream)
+                val base64Image = convertImageToBase64(bitmap)
 
-                // Guardar la imagen como Base64 en la base de datos
                 databaseReference.child(userId!!).child("profileImage").setValue(base64Image)
                     .addOnSuccessListener {
-                        Toast.makeText(this, "Foto de perfil guardada correctamente", Toast.LENGTH_SHORT).show()
-                        // Puedes cargar la imagen directamente desde Base64 si es necesario
                         Glide.with(this)
-                            .load(base64Image)
-                            .apply(RequestOptions.circleCropTransform()) // Imagen circular
+                            .load(uri)
+                            .apply(RequestOptions.circleCropTransform())
                             .placeholder(R.drawable.ic_profile_placeholder)
                             .into(profileImageView)
+                        Toast.makeText(this, "Foto de perfil guardada correctamente", Toast.LENGTH_SHORT).show()
                     }
-                    .addOnFailureListener {
-                        Toast.makeText(this, "Error al guardar la referencia en la base de datos", Toast.LENGTH_SHORT).show()
+                    .addOnFailureListener { e ->
+                        Toast.makeText(this, "Error al guardar la foto: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
                     }
-            } catch (e: Exception) {
-                Toast.makeText(this, "Error al guardar la foto de perfil: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
             }
-        } ?: run {
-            Toast.makeText(this, "Error: URI de imagen no disponible", Toast.LENGTH_SHORT).show()
         }
     }
 
-    // Función para convertir una imagen a Base64
-    fun convertImageToBase64(uri: Uri): String {
-        val inputStream = contentResolver.openInputStream(uri)
-        val bitmap = BitmapFactory.decodeStream(inputStream)
-
+    // Función para convertir la imagen a Base64
+    private fun convertImageToBase64(bitmap: Bitmap): String {
         val byteArrayOutputStream = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
         val byteArray = byteArrayOutputStream.toByteArray()
-
         return Base64.encodeToString(byteArray, Base64.DEFAULT)
     }
-
 }
-

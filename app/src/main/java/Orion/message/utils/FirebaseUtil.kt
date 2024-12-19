@@ -395,95 +395,95 @@ object FirebaseUtil {
     }
 
     fun loadUserProfileImage(context: Context, username: String, callback: (File?) -> Unit) {
-        // Llamar a la función getUserIdByUsername para obtener el userId
         getUserIdByUsername(username) { userId ->
             if (userId != null) {
-                // Referencia al nodo "pictures" del usuario
                 val picturesRef = FirebaseDatabase.getInstance().reference.child("pictures").child(userId)
 
-                // Leer la imagen desde la base de datos
                 picturesRef.addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onDataChange(snapshot: DataSnapshot) {
-                        // Obtener el valor del campo 'profileImage' que contiene la cadena base64
                         val base64String = snapshot.child("profileImage").getValue(String::class.java)
 
-                        // Verificar si la cadena no es nula o vacía
                         if (!base64String.isNullOrEmpty()) {
                             try {
-                                // Decodificar la cadena Base64 a un bitmap
                                 val decodedBytes = Base64.decode(base64String, Base64.DEFAULT)
                                 val bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
 
-                                // Guardar la imagen decodificada en un archivo
+                                // Guardar el archivo con un nombre único cada vez
                                 val file = saveBitmapToFile(bitmap, context)
 
-                                // Llamar al callback y pasar el archivo
                                 callback(file)
-
                             } catch (e: Exception) {
-                                // En caso de error, devolver null
                                 e.printStackTrace()
                                 callback(null)
                             }
                         } else {
-                            // Si la cadena es nula o vacía, devolver null
-                            callback(null)
+                            callback(null) // No hay imagen guardada
                         }
                     }
 
                     override fun onCancelled(error: DatabaseError) {
-                        // En caso de error en la consulta a la base de datos, devolver null
                         callback(null)
                     }
                 })
             } else {
-                // Si no se encuentra el userId para el username, devolver null
                 callback(null)
             }
         }
     }
 
-    private fun saveBitmapToFile(bitmap: Bitmap, context: Context): File {
-        val file = File(context.cacheDir, "profile_image.jpg")
+    private fun saveBitmapToFile(bitmap: Bitmap, context: Context): File? {
+        val fileName = "profile_image_${System.currentTimeMillis()}.jpg" // Nombre único
+        val file = File(context.cacheDir, fileName)
         try {
             val fileOutputStream = FileOutputStream(file)
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream)
             fileOutputStream.flush()
             fileOutputStream.close()
+            return file
         } catch (e: IOException) {
             e.printStackTrace()
+            return null
         }
-        return file
     }
 
+
+
     fun checkIfUserHasImage(username: String, callback: (Boolean) -> Unit, onError: (String) -> Unit = {}) {
-        // Llamar a la función getUserIdByUsername para obtener el userId
         getUserIdByUsername(username) { userId ->
             if (userId != null) {
-                // Referencia al nodo "pictures" del usuario
                 val picturesRef = FirebaseDatabase.getInstance().reference.child("pictures").child(userId)
 
-                // Verificar si el nodo "pictures" para el usuario tiene datos
                 picturesRef.addListenerForSingleValueEvent(object : ValueEventListener {
-                    override fun onDataChange(pictureSnapshot: DataSnapshot) {
-                        // Comprobar si el usuario tiene imagen de perfil
-                        val hasImage = pictureSnapshot.exists() && pictureSnapshot.child("profileImage").getValue(String::class.java).isNullOrEmpty().not()
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        val hasImage = snapshot.child("profileImage").exists() &&
+                                !snapshot.child("profileImage").getValue(String::class.java).isNullOrEmpty()
                         callback(hasImage)
                     }
 
                     override fun onCancelled(error: DatabaseError) {
-                        onError("Error al comprobar la existencia de la imagen: ${error.message}")
+                        onError("Error al comprobar la imagen: ${error.message}")
                     }
                 })
             } else {
-                onError("No se encontró el usuario con ese username.")
+                onError("Usuario no encontrado.")
             }
         }
     }
 
+    fun deleteUserProfileImageFromDatabase(context: Context) {
+        // Obtener el usuario autenticado actual
+        val userId = getCurrentUserId()
 
+        // Referencia a la base de datos de Firebase Realtime Database
+        val databaseReference = getDatabaseReference("pictures").child(userId!!)
 
-
+        // Eliminar la imagen de perfil (referencia) en la base de datos
+        databaseReference.removeValue()
+            .addOnSuccessListener {
+            }
+            .addOnFailureListener { exception ->
+            }
+    }
 
     // Clase de datos Contact para manejar los contactos
     data class Contact(
