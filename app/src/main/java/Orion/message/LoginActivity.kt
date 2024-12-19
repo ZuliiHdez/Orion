@@ -34,6 +34,16 @@ class LoginActivity : AppCompatActivity() {
         val rememberMeCheckBox = findViewById<CheckBox>(R.id.rememberMeCheckBox)
         val googleSignInButton = findViewById<ImageButton>(R.id.googleSignInButton)
         val passwordToggleIcon = findViewById<ImageView>(R.id.passwordToggleIcon)
+        val continuedWith = findViewById<TextView>(R.id.continueWith)
+        val remember_me = findViewById<CheckBox>(R.id.rememberMeCheckBox)
+
+        passwordEditText.hint = getString(R.string.password_hint)
+        emailEditText.hint = getString(R.string.email_hint)
+        forgotPasswordTextView.text = getString(R.string.forgot_password)
+        loginButton.text = getString(R.string.login_button)
+        registerTextView.text = getString(R.string.register_text)
+        continuedWith.text = getString(R.string.continue_with)
+        remember_me.text = getString(R.string.remember_me)
 
         val savedEmail = sharedPreferences.getString("email", "")
         val savedPassword = sharedPreferences.getString("password", "")

@@ -8,14 +8,12 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
-import com.google.firebase.firestore.FirebaseFirestore
 
 object FirebaseUtil {
 
     private val database: FirebaseDatabase by lazy { FirebaseDatabase.getInstance() }
     private val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
     data class FriendRequest(val senderName: String)
-    private val db = FirebaseFirestore.getInstance()
 
     // Verificar si el usuario está autenticado
     fun isUserAuthenticated(): Boolean {
