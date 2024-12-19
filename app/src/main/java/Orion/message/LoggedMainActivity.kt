@@ -1,5 +1,6 @@
 package Orion.message
 
+import Orion.message.utils.FirebaseUtil
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.content.ClipData
@@ -20,6 +21,7 @@ import com.bumptech.glide.Glide
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import androidx.viewpager2.widget.ViewPager2
+import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.DataSnapshot
@@ -61,11 +63,36 @@ class LoggedMainActivity : AppCompatActivity() {
                     userName.text = fullName
                     currentUsername = snapshot.child("username").value as? String ?: "Usuario Desconocido"
 
-                    // Actualizar imagen de perfil
-                    Glide.with(this@LoggedMainActivity)
-                        .load(profileImage)
-                        .placeholder(R.drawable.ic_profile_placeholder)
-                        .into(profileImageView)
+
+                    // Verificar si el usuario tiene una imagen en el nodo "pictures"
+                    FirebaseUtil.checkIfUserHasImage(currentUsername, // Reemplaza con el nombre de usuario que desees
+                        callback = { hasImage ->
+                            if (hasImage) {
+                                // Si el usuario tiene una imagen, la cargamos
+                                FirebaseUtil.loadUserProfileImage(this@LoggedMainActivity, currentUsername) { imageFile ->
+                                    // Verificamos si tenemos un archivo de imagen
+                                    imageFile?.let {
+                                        // Usamos Glide para cargar la imagen desde el archivo
+                                        Glide.with(this@LoggedMainActivity)
+                                            .load(it)  // Cargar el archivo de imagen
+                                            .apply(RequestOptions.circleCropTransform())  // Transformación circular
+                                            .into(profileImageView)  // Colocamos la imagen en el ImageView
+                                    } ?: run {
+                                        // Si no se encuentra la imagen, mostramos un error
+                                        Toast.makeText(this@LoggedMainActivity, "No se encontró la imagen", Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                            } else {
+                                // Si el usuario no tiene imagen de perfil, mostramos un mensaje
+                                Toast.makeText(this@LoggedMainActivity, "No hay imagen", Toast.LENGTH_SHORT).show()
+                            }
+                        },
+                        onError = { errorMessage ->
+                            // En caso de error, mostramos un mensaje
+                            Toast.makeText(this@LoggedMainActivity, errorMessage, Toast.LENGTH_SHORT).show()
+                        }
+                    )
+
 
                     // Actualizar estado
                     statusView.text = status

@@ -15,6 +15,10 @@ import Orion.message.utils.FirebaseUtil.getUserIdByUsername
 import Orion.message.model.ChatMessagesAdapter
 import Orion.message.utils.FirebaseUtil.checkChatroomExists
 import Orion.message.utils.FirebaseUtil.getCurrentUserId
+import android.widget.ImageView
+import android.widget.RelativeLayout
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -26,6 +30,7 @@ class ChatActivity : AppCompatActivity() {
     private lateinit var sendButton: ImageButton
     private lateinit var otherUsernameTextView: TextView
     private lateinit var backButton: ImageButton
+    private lateinit var profileImageView: ImageView  // Imagen de perfil del contacto
 
     private lateinit var chatMessagesAdapter: ChatMessagesAdapter
     private lateinit var currentUserId: String
@@ -57,6 +62,18 @@ class ChatActivity : AppCompatActivity() {
 
                 if (chatUsername.isNotEmpty() && chatFullName.isNotEmpty()) {
                     otherUsernameTextView.text = chatFullName
+
+                    // Cargar la imagen de perfil del contacto
+                    FirebaseUtil.loadUserProfileImage(this@ChatActivity, chatUsername) { imageFile ->
+                        imageFile?.let {
+                            // Usamos Glide para cargar la imagen desde el archivo
+                            Glide.with(this@ChatActivity)
+                                .load(it)  // Cargar el archivo de imagen
+                                .apply(RequestOptions.circleCropTransform())  // Transformación circular
+                                .into(profileImageView)  // Colocamos la imagen en el ImageView
+                        }
+                    }
+
                     getUserIdByUsername(chatUsername) { chatUserId ->
                         if (chatUserId != null) {
                             chatroomId = generateChatroomId(currentUserId, chatUserId)
@@ -84,8 +101,14 @@ class ChatActivity : AppCompatActivity() {
         sendButton = findViewById(R.id.message_send_btn)
         otherUsernameTextView = findViewById(R.id.other_username)
         backButton = findViewById(R.id.back_btn)
+
+        // Aquí accedemos correctamente al ImageView dentro de profile_pic_layout
+        val profilePicLayout = findViewById<RelativeLayout>(R.id.profile_pic_layout)
+        profileImageView = profilePicLayout.findViewById(R.id.profile_pic_image_view) // Accedemos al ImageView
+
         otherUsernameTextView.text = chatUsername
     }
+
 
     private fun setupRecyclerView() {
         recyclerView.layoutManager = LinearLayoutManager(this)

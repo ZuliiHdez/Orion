@@ -89,16 +89,19 @@ class ChatsFragment : Fragment() {
     // Función para cargar los contactos en el RecyclerView
     private fun loadContacts() {
         FirebaseUtil.getUserContacts(currentUsername) { contacts ->
-            contactsList = contacts // Almacenar los contactos localmente
-            if (contacts.isEmpty() && !hasShownNoContactsMessage) {
-                Toast.makeText(context, "No tienes contactos aún", Toast.LENGTH_SHORT).show()
-                hasShownNoContactsMessage = true
-            } else {
-                recyclerView.adapter = ChatAdapter(contacts)
-                hasShownNoContactsMessage = false
+            if (contacts != contactsList) {
+                contactsList = contacts // Almacenar los contactos localmente
+                if (contacts.isEmpty() && !hasShownNoContactsMessage) {
+                    Toast.makeText(context, "No tienes contactos aún", Toast.LENGTH_SHORT).show()
+                    hasShownNoContactsMessage = true
+                } else {
+                    recyclerView.adapter = ChatAdapter(contacts)
+                    hasShownNoContactsMessage = false
+                }
             }
         }
     }
+
 
     // Función para filtrar los contactos en función de la búsqueda
     private fun filterContacts(query: String) {

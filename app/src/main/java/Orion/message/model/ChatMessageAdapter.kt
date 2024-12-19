@@ -40,13 +40,6 @@ class ChatMessagesAdapter(
     }
 
 
-    /**
-     * Agregar un nuevo mensaje a la lista.
-     */
-    fun addMessage(message: FirebaseUtil.Message) {
-        messages.add(message)
-        notifyItemInserted(messages.size - 1)
-    }
 
     // ViewHolder para cada mensaje
     class MessageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

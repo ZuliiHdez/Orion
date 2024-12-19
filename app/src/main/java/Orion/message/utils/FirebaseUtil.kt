@@ -1,13 +1,21 @@
 package Orion.message.utils
 
+import Orion.message.R
+import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.util.Base64
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+
 
 object FirebaseUtil {
 
@@ -385,6 +393,97 @@ object FirebaseUtil {
             }
         })
     }
+
+    fun loadUserProfileImage(context: Context, username: String, callback: (File?) -> Unit) {
+        // Llamar a la función getUserIdByUsername para obtener el userId
+        getUserIdByUsername(username) { userId ->
+            if (userId != null) {
+                // Referencia al nodo "pictures" del usuario
+                val picturesRef = FirebaseDatabase.getInstance().reference.child("pictures").child(userId)
+
+                // Leer la imagen desde la base de datos
+                picturesRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        // Obtener el valor del campo 'profileImage' que contiene la cadena base64
+                        val base64String = snapshot.child("profileImage").getValue(String::class.java)
+
+                        // Verificar si la cadena no es nula o vacía
+                        if (!base64String.isNullOrEmpty()) {
+                            try {
+                                // Decodificar la cadena Base64 a un bitmap
+                                val decodedBytes = Base64.decode(base64String, Base64.DEFAULT)
+                                val bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.size)
+
+                                // Guardar la imagen decodificada en un archivo
+                                val file = saveBitmapToFile(bitmap, context)
+
+                                // Llamar al callback y pasar el archivo
+                                callback(file)
+
+                            } catch (e: Exception) {
+                                // En caso de error, devolver null
+                                e.printStackTrace()
+                                callback(null)
+                            }
+                        } else {
+                            // Si la cadena es nula o vacía, devolver null
+                            callback(null)
+                        }
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        // En caso de error en la consulta a la base de datos, devolver null
+                        callback(null)
+                    }
+                })
+            } else {
+                // Si no se encuentra el userId para el username, devolver null
+                callback(null)
+            }
+        }
+    }
+
+    private fun saveBitmapToFile(bitmap: Bitmap, context: Context): File {
+        val file = File(context.cacheDir, "profile_image.jpg")
+        try {
+            val fileOutputStream = FileOutputStream(file)
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream)
+            fileOutputStream.flush()
+            fileOutputStream.close()
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+        return file
+    }
+
+    fun checkIfUserHasImage(username: String, callback: (Boolean) -> Unit, onError: (String) -> Unit = {}) {
+        // Llamar a la función getUserIdByUsername para obtener el userId
+        getUserIdByUsername(username) { userId ->
+            if (userId != null) {
+                // Referencia al nodo "pictures" del usuario
+                val picturesRef = FirebaseDatabase.getInstance().reference.child("pictures").child(userId)
+
+                // Verificar si el nodo "pictures" para el usuario tiene datos
+                picturesRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(pictureSnapshot: DataSnapshot) {
+                        // Comprobar si el usuario tiene imagen de perfil
+                        val hasImage = pictureSnapshot.exists() && pictureSnapshot.child("profileImage").getValue(String::class.java).isNullOrEmpty().not()
+                        callback(hasImage)
+                    }
+
+                    override fun onCancelled(error: DatabaseError) {
+                        onError("Error al comprobar la existencia de la imagen: ${error.message}")
+                    }
+                })
+            } else {
+                onError("No se encontró el usuario con ese username.")
+            }
+        }
+    }
+
+
+
+
 
     // Clase de datos Contact para manejar los contactos
     data class Contact(

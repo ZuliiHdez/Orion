@@ -1,19 +1,22 @@
 package Orion.message
 
+import Orion.message.utils.FirebaseUtil
 import android.app.Activity
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.Toast
+import android.util.Base64
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.storage.FirebaseStorage
-import com.squareup.picasso.Picasso
+import java.io.ByteArrayOutputStream
+import java.io.File
 
 class EditProfileActivity : AppCompatActivity() {
 
@@ -25,11 +28,9 @@ class EditProfileActivity : AppCompatActivity() {
     private lateinit var emailEditText: EditText
     private lateinit var saveButton: Button
 
-    private val firebaseAuth = FirebaseAuth.getInstance()
-    private val databaseReference = FirebaseDatabase.getInstance().reference.child("Users")
-    private val storageReference = FirebaseStorage.getInstance().reference.child("ProfileImages")
-    private val userId = firebaseAuth.currentUser?.uid
-
+    private val databaseReference = FirebaseUtil.getDatabaseReference("pictures")
+    private val db = FirebaseUtil.getDatabaseReference("Users")
+    private val userId = FirebaseUtil.getCurrentUserId()
     private val PICK_IMAGE_REQUEST = 101
     private var imageUri: Uri? = null
 
@@ -45,29 +46,50 @@ class EditProfileActivity : AppCompatActivity() {
         emailEditText = findViewById(R.id.emailEditText)
         saveButton = findViewById(R.id.saveButton)
 
-        fullNameEditText.hint = getString(R.string.fullname_hint)
-        usernameEditText.hint = getString(R.string.username_hint)
-        statusEditText.hint = getString(R.string.status_hint)
-        emailEditText.hint = getString(R.string.email_hint)
-        saveButton.text = getString(R.string.save)
-
         // Cargar datos del usuario
         if (userId != null) {
-            databaseReference.child(userId).get().addOnSuccessListener { snapshot ->
+            db.child(userId).get().addOnSuccessListener { snapshot ->
                 val fullName = snapshot.child("fullName").value as? String ?: ""
                 val username = snapshot.child("username").value as? String ?: ""
                 val status = snapshot.child("status").value as? String ?: ""
                 val email = snapshot.child("email").value as? String ?: ""
-                val profileImageUrl = snapshot.child("profileImageUrl").value as? String
+
 
                 fullNameEditText.setText(fullName)
                 usernameEditText.setText(username)
                 statusEditText.setText(status)
                 emailEditText.setText(email)
 
-                if (!profileImageUrl.isNullOrEmpty()) {
-                    Picasso.get().load(profileImageUrl).into(profileImageView)
-                }
+                // Primero, verificamos si el usuario tiene una imagen de perfil
+                FirebaseUtil.checkIfUserHasImage(username, // Reemplaza con el nombre de usuario que desees
+                    callback = { hasImage ->
+                        if (hasImage) {
+                            // Si el usuario tiene una imagen, la cargamos
+                            FirebaseUtil.loadUserProfileImage(this@EditProfileActivity, username) { imageFile ->
+                                // Verificamos si tenemos un archivo de imagen
+                                imageFile?.let {
+                                    // Usamos Glide para cargar la imagen desde el archivo
+                                    Glide.with(this@EditProfileActivity)
+                                        .load(it)  // Cargar el archivo de imagen
+                                        .apply(RequestOptions.circleCropTransform())  // Transformación circular
+                                        .into(profileImageView)  // Colocamos la imagen en el ImageView
+                                } ?: run {
+                                    // Si no se encuentra la imagen, mostramos un error
+                                    Toast.makeText(this@EditProfileActivity, "No se encontró la imagen", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        } else {
+                            // Si el usuario no tiene imagen de perfil, mostramos un mensaje
+                            Toast.makeText(this@EditProfileActivity, "No hay imagen", Toast.LENGTH_SHORT).show()
+                        }
+                    },
+                    onError = { errorMessage ->
+                        // En caso de error, mostramos un mensaje
+                        Toast.makeText(this@EditProfileActivity, errorMessage, Toast.LENGTH_SHORT).show()
+                    }
+                )
+
+
             }
         }
 
@@ -91,10 +113,13 @@ class EditProfileActivity : AppCompatActivity() {
                     "email" to email
                 )
 
-                databaseReference.child(userId!!).updateChildren(updates).addOnCompleteListener { task ->
+                db.child(userId!!).updateChildren(updates).addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         Toast.makeText(this, "Perfil actualizado correctamente", Toast.LENGTH_SHORT).show()
                         uploadProfileImage()
+
+                        // Regresar a la actividad anterior después de guardar los cambios
+                        finish()
                     } else {
                         Toast.makeText(this, "Error al actualizar el perfil: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                     }
@@ -103,6 +128,7 @@ class EditProfileActivity : AppCompatActivity() {
                 Toast.makeText(this, "Por favor, llena todos los campos", Toast.LENGTH_SHORT).show()
             }
         }
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -115,16 +141,43 @@ class EditProfileActivity : AppCompatActivity() {
 
     private fun uploadProfileImage() {
         imageUri?.let { uri ->
-            val fileRef = storageReference.child("$userId.jpg")
-            fileRef.putFile(uri).addOnCompleteListener { uploadTask ->
-                if (uploadTask.isSuccessful) {
-                    fileRef.downloadUrl.addOnSuccessListener { downloadUri ->
-                        databaseReference.child(userId!!).child("profileImageUrl").setValue(downloadUri.toString())
+            try {
+                // Convertir la imagen a Base64
+                val base64Image = convertImageToBase64(uri)
+
+                // Guardar la imagen como Base64 en la base de datos
+                databaseReference.child(userId!!).child("profileImage").setValue(base64Image)
+                    .addOnSuccessListener {
+                        Toast.makeText(this, "Foto de perfil guardada correctamente", Toast.LENGTH_SHORT).show()
+                        // Puedes cargar la imagen directamente desde Base64 si es necesario
+                        Glide.with(this)
+                            .load(base64Image)
+                            .apply(RequestOptions.circleCropTransform()) // Imagen circular
+                            .placeholder(R.drawable.ic_profile_placeholder)
+                            .into(profileImageView)
                     }
-                } else {
-                    Toast.makeText(this, "Error al subir la foto de perfil: ${uploadTask.exception?.message}", Toast.LENGTH_SHORT).show()
-                }
+                    .addOnFailureListener {
+                        Toast.makeText(this, "Error al guardar la referencia en la base de datos", Toast.LENGTH_SHORT).show()
+                    }
+            } catch (e: Exception) {
+                Toast.makeText(this, "Error al guardar la foto de perfil: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
             }
+        } ?: run {
+            Toast.makeText(this, "Error: URI de imagen no disponible", Toast.LENGTH_SHORT).show()
         }
     }
+
+    // Función para convertir una imagen a Base64
+    fun convertImageToBase64(uri: Uri): String {
+        val inputStream = contentResolver.openInputStream(uri)
+        val bitmap = BitmapFactory.decodeStream(inputStream)
+
+        val byteArrayOutputStream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
+        val byteArray = byteArrayOutputStream.toByteArray()
+
+        return Base64.encodeToString(byteArray, Base64.DEFAULT)
+    }
+
 }
+
